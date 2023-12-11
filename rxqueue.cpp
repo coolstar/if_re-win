@@ -73,12 +73,29 @@ EvtAdapterCreateRxQueue(
 
     NetRxQueueGetExtension(rxQueue, &extension, &rx->HashValueExtension);
 
-    /*GOTO_IF_NOT_NT_SUCCESS(Exit, status,
-        RtRxQueueInitialize(rxQueue, adapter));*/
+    GOTO_IF_NOT_NT_SUCCESS(Exit, status,
+        RtRxQueueInitialize(rxQueue, adapter));
 
 Exit:
     TraceExitResult(status);
 
+    return status;
+}
+
+NTSTATUS
+RtRxQueueInitialize(
+    _In_ NETPACKETQUEUE rxQueue,
+    _In_ RT_ADAPTER* adapter
+)
+{
+    NTSTATUS status = STATUS_SUCCESS;
+
+    RT_RXQUEUE* rx = RtGetRxQueueContext(rxQueue);
+
+    rx->Adapter = adapter;
+    rx->Rings = NetRxQueueGetRingCollection(rxQueue);
+
+Exit:
     return status;
 }
 
@@ -136,6 +153,23 @@ EvtRxQueueCancel(
 
     RT_RXQUEUE* rx = RtGetRxQueueContext(rxQueue);
     RT_ADAPTER* adapter = rx->Adapter;
+
+    // try (but not very hard) to grab anything that may have been
+    // indicated during rx disable. advance will continue to be called
+    // after cancel until all packets are returned to the framework.
+
+    NET_RING* pr = NetRingCollectionGetPacketRing(rx->Rings);
+
+    while (pr->BeginIndex != pr->EndIndex)
+    {
+        NET_PACKET* packet = NetRingGetPacketAtIndex(pr, pr->BeginIndex);
+        packet->Ignore = 1;
+
+        pr->BeginIndex = NetRingIncrementIndex(pr, pr->BeginIndex);
+    }
+
+    NET_RING* fr = NetRingCollectionGetFragmentRing(rx->Rings);
+    fr->BeginIndex = fr->EndIndex;
 
     TraceExit();
 }
