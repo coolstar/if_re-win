@@ -86,12 +86,29 @@ EvtAdapterCreateTxQueue(
 
     NetTxQueueGetExtension(txQueue, &extension, &tx->LogicalAddressExtension);
 
-    /*GOTO_IF_NOT_NT_SUCCESS(Exit, status,
-        RtTxQueueInitialize(txQueue, adapter));*/
+    GOTO_IF_NOT_NT_SUCCESS(Exit, status,
+        RtTxQueueInitialize(txQueue, adapter));
 
 Exit:
     TraceExitResult(status);
 
+    return status;
+}
+
+NTSTATUS
+RtTxQueueInitialize(
+    _In_ NETPACKETQUEUE txQueue,
+    _In_ RT_ADAPTER* adapter
+)
+{
+    NTSTATUS status = STATUS_SUCCESS;
+
+    RT_TXQUEUE* tx = RtGetTxQueueContext(txQueue);
+
+    tx->Adapter = adapter;
+    tx->Rings = NetTxQueueGetRingCollection(txQueue);
+
+Exit:
     return status;
 }
 
@@ -144,11 +161,27 @@ EvtTxQueueCancel(
 {
     TraceEntry(TraceLoggingPointer(txQueue, "TxQueue"));
 
+    RT_TXQUEUE* tx = RtGetTxQueueContext(txQueue);
+    RT_ADAPTER* adapter = tx->Adapter;
+
     //
     // If the chipset is able to cancel outstanding IOs, then it should do so
     // here. However, the RTL8168D does not seem to support such a feature, so
     // the queue will continue to be drained like normal.
     //
+
+    NET_RING* pr = NetRingCollectionGetPacketRing(tx->Rings);
+
+    while (pr->BeginIndex != pr->EndIndex)
+    {
+        NET_PACKET* packet = NetRingGetPacketAtIndex(pr, pr->BeginIndex);
+        packet->Ignore = 1;
+
+        pr->BeginIndex = NetRingIncrementIndex(pr, pr->BeginIndex);
+    }
+
+    NET_RING* fr = NetRingCollectionGetFragmentRing(tx->Rings);
+    fr->BeginIndex = fr->EndIndex;
 
     TraceExit();
 }
