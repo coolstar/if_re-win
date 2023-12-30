@@ -15,6 +15,10 @@ typedef struct _RT_ADAPTER
 
     struct rtl8125_private linuxData;
 
+    // MMIO
+    PVOID MMIOAddress;
+    SIZE_T MMIOSize;
+
     NET_ADAPTER_LINK_LAYER_ADDRESS PermanentAddress;
     NET_ADAPTER_LINK_LAYER_ADDRESS CurrentAddress;
 } RT_ADAPTER, * PRT_ADAPTER;
