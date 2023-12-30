@@ -192,10 +192,16 @@
   <ItemGroup>
     <ClInclude Include="adapter.h" />
     <ClInclude Include="device.h" />
+    <ClInclude Include="ethertool.h" />
     <ClInclude Include="forward.h" />
+    <ClInclude Include="if_ether.h" />
+    <ClInclude Include="linux.h" />
+    <ClInclude Include="LucyRTL8125Linux-900501.hpp" />
+    <ClInclude Include="mii.h" />
     <ClInclude Include="power.h" />
     <ClInclude Exclude="@(ClInclude)" Include="precomp.h" />
     <ClInclude Include="common.h" />
+    <ClInclude Include="r8125_dash.h" />
     <ClInclude Include="rxqueue.h" />
     <ClInclude Include="trace.h" />
     <ClInclude Include="txqueue.h" />
@@ -204,6 +210,12 @@
     <ClCompile Include="adapter.cpp" />
     <ClCompile Include="device.cpp" />
     <ClCompile Include="driver.cpp" />
+    <ClCompile Include="LucyRTL8125Linux-900501.cpp">
+      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">stdcpp20</LanguageStandard>
+      <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Release|x64'">stdcpp20</LanguageStandard>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="power.cpp" />
     <ClCompile Include="rxqueue.cpp" />
     <ClCompile Include="txqueue.cpp" />

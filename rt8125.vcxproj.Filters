@@ -17,6 +17,12 @@
       <Extensions>inf;inv;inx;mof;mc;</Extensions>
       <UniqueIdentifier>{FD9F921C-D1EF-421B-A692-F23423B32E64}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Mieze">
+      <UniqueIdentifier>{7760f199-d449-46c6-a833-8f546622e0da}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Mieze">
+      <UniqueIdentifier>{bea8b48d-e768-4cfc-960f-e1d2b4f47c3f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Inf Include="rt8125.inx">
@@ -50,6 +56,9 @@
     <ClCompile Include="txqueue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="LucyRTL8125Linux-900501.cpp">
+      <Filter>Source Files\Mieze</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="adapter.h">
@@ -77,6 +86,24 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="txqueue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ethertool.h">
+      <Filter>Header Files\Mieze</Filter>
+    </ClInclude>
+    <ClInclude Include="if_ether.h">
+      <Filter>Header Files\Mieze</Filter>
+    </ClInclude>
+    <ClInclude Include="mii.h">
+      <Filter>Header Files\Mieze</Filter>
+    </ClInclude>
+    <ClInclude Include="r8125_dash.h">
+      <Filter>Header Files\Mieze</Filter>
+    </ClInclude>
+    <ClInclude Include="LucyRTL8125Linux-900501.hpp">
+      <Filter>Header Files\Mieze</Filter>
+    </ClInclude>
+    <ClInclude Include="linux.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
