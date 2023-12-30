@@ -12,6 +12,50 @@
 
 extern const struct RTLChipInfo rtl_chip_info[];
 
+UINT8 ConfigRead8(_In_ RT_ADAPTER* adapter, UINT32 reg) {
+    UINT8 val;
+    adapter->PciConfig.GetBusData(
+        adapter->PciConfig.Context,
+        PCI_WHICHSPACE_CONFIG,
+        &val,
+        reg,
+        sizeof(val));
+    return val;
+}
+
+UINT16 ConfigRead16(_In_ RT_ADAPTER* adapter, UINT32 reg) {
+    UINT16 val;
+    adapter->PciConfig.GetBusData(
+        adapter->PciConfig.Context,
+        PCI_WHICHSPACE_CONFIG,
+        &val,
+        reg,
+        sizeof(val));
+    return val;
+}
+
+void ConfigWrite8(_In_ RT_ADAPTER* adapter, UINT32 reg, UINT8 val) {
+    adapter->PciConfig.SetBusData(
+        adapter->PciConfig.Context,
+        PCI_WHICHSPACE_CONFIG,
+        &val,
+        reg,
+        sizeof(val));
+}
+
+void ConfigWrite16(_In_ RT_ADAPTER* adapter, UINT32 reg, UINT16 val) {
+    adapter->PciConfig.SetBusData(
+        adapter->PciConfig.Context,
+        PCI_WHICHSPACE_CONFIG,
+        &val,
+        reg,
+        sizeof(val));
+}
+
+UINT8 csiFun0ReadByte(_In_ RT_ADAPTER* adapter, UINT32 addr);
+void csiFun0WriteByte(_In_ RT_ADAPTER* adapter, UINT32 addr, UINT8 value);
+void exitOOB(_In_ RT_ADAPTER* adapter);
+
 NTSTATUS RtlIdentifyChip(_In_ RT_ADAPTER* adapter) {
     struct rtl8125_private* tp = &adapter->linuxData;
     NTSTATUS result = STATUS_SUCCESS;
@@ -152,23 +196,23 @@ NTSTATUS RtlInitHw(_In_ RT_ADAPTER* adapter)
         case CFG_METHOD_3:
         case CFG_METHOD_4:
         case CFG_METHOD_5:
-            tp->org_pci_offset_99 = csiFun0ReadByte(0x99);
+            tp->org_pci_offset_99 = csiFun0ReadByte(adapter, 0x99);
             tp->org_pci_offset_99 &= ~(BIT_5 | BIT_6);
             break;
         }
         switch (tp->mcfg) {
         case CFG_METHOD_2:
         case CFG_METHOD_3:
-            tp->org_pci_offset_180 = csiFun0ReadByte(0x264);
+            tp->org_pci_offset_180 = csiFun0ReadByte(adapter, 0x264);
             break;
         case CFG_METHOD_4:
         case CFG_METHOD_5:
-            tp->org_pci_offset_180 = csiFun0ReadByte(0x214);
+            tp->org_pci_offset_180 = csiFun0ReadByte(adapter, 0x214);
             break;
         }
     }
-    tp->org_pci_offset_80 = pciDevice->configRead8(0x80);
-    tp->org_pci_offset_81 = pciDevice->configRead8(0x81);
+    tp->org_pci_offset_80 = ConfigRead8(adapter, 0x80);
+    tp->org_pci_offset_81 = ConfigRead8(adapter, 0x81);
     tp->use_timer_interrrupt = FALSE;
 
     switch (tp->mcfg) {
@@ -313,12 +357,12 @@ NTSTATUS RtlInitHw(_In_ RT_ADAPTER* adapter)
     tp->wol_enabled = (tp->wol_opts) ? WOL_ENABLED : WOL_DISABLED;
 
     /* Set wake on LAN support. */
-    wolCapable = (tp->wol_enabled == WOL_ENABLED);
+    adapter->wolCapable = (tp->wol_enabled == WOL_ENABLED);
 
     //tp->eee_enabled = eee_enable;
     tp->eee_adv_t = MDIO_EEE_1000T | MDIO_EEE_100TX;
 
-    exitOOB();
+    exitOOB(adapter);
     rtl8125_hw_init(tp);
     rtl8125_nic_reset(tp);
 
@@ -361,17 +405,17 @@ NTSTATUS RtlInitHw(_In_ RT_ADAPTER* adapter)
 
     tp->cp_cmd = (ReadReg16(CPlusCmd) | RxChkSum);
 
-    intrMaskRxTx = (SYSErr | LinkChg | RxDescUnavail | TxErr | TxOK | RxErr | RxOK);
-    intrMaskPoll = (SYSErr | LinkChg);
-    intrMask = intrMaskRxTx;
+    adapter->intrMaskRxTx = (SYSErr | LinkChg | RxDescUnavail | TxErr | TxOK | RxErr | RxOK);
+    adapter->intrMaskPoll = (SYSErr | LinkChg);
+    adapter->intrMask = adapter->intrMaskRxTx;
 
     /* Get the RxConfig parameters. */
-    rxConfigReg = rtl_chip_info[tp->chipset].RCR_Cfg;
-    rxConfigMask = rtl_chip_info[tp->chipset].RxConfigMask;
+    adapter->rxConfigReg = rtl_chip_info[tp->chipset].RCR_Cfg;
+    adapter->rxConfigMask = rtl_chip_info[tp->chipset].RxConfigMask;
 
     /* Reset the tally counter. */
-    WriteReg32(CounterAddrHigh, (statPhyAddr >> 32));
-    WriteReg32(CounterAddrLow, (statPhyAddr & 0x00000000ffffffff) | CounterReset);
+    WriteReg32(CounterAddrHigh, (adapter->statPhyAddr >> 32));
+    WriteReg32(CounterAddrLow, (adapter->statPhyAddr & 0x00000000ffffffff) | CounterReset);
 
     rtl8125_disable_rxdvgate(tp);
 
@@ -387,4 +431,110 @@ NTSTATUS RtlInitHw(_In_ RT_ADAPTER* adapter)
 done:
     TraceExitResult(result);
     return result;
+}
+
+UINT8 csiFun0ReadByte(_In_ RT_ADAPTER* adapter, UINT32 addr) {
+    struct rtl8125_private* tp = &adapter->linuxData;
+    UINT8 retVal = 0;
+
+    if (tp->mcfg == CFG_METHOD_DEFAULT) {
+        retVal = ConfigRead8(adapter, addr);
+    }
+    else {
+        UINT32 tmpUlong;
+        UINT8 shiftByte;
+
+        shiftByte = addr & (0x3);
+        tmpUlong = rtl8125_csi_other_fun_read(tp, 0, addr);
+        tmpUlong >>= (8 * shiftByte);
+        retVal = (UINT8)tmpUlong;
+    }
+    udelay(20);
+
+    return retVal;
+}
+
+void csiFun0WriteByte(_In_ RT_ADAPTER* adapter, UINT32 addr, UINT8 value)
+{
+    struct rtl8125_private* tp = &adapter->linuxData;
+
+    if (tp->mcfg == CFG_METHOD_DEFAULT) {
+        ConfigWrite8(adapter, addr, value);
+    }
+    else {
+        UINT32 tmpUlong;
+        UINT16 regAlignAddr;
+        UINT8 shiftByte;
+
+        regAlignAddr = addr & ~(0x3);
+        shiftByte = addr & (0x3);
+        tmpUlong = rtl8125_csi_other_fun_read(tp, 0, regAlignAddr);
+        tmpUlong &= ~(0xFF << (8 * shiftByte));
+        tmpUlong |= (value << (8 * shiftByte));
+        rtl8125_csi_other_fun_write(tp, 0, regAlignAddr, tmpUlong);
+    }
+    udelay(20);
+}
+
+void exitOOB(_In_ RT_ADAPTER* adapter)
+{
+    struct rtl8125_private* tp = &adapter->linuxData;
+    UINT16 data16;
+
+    WriteReg32(RxConfig, ReadReg32(RxConfig) & ~(AcceptErr | AcceptRunt | AcceptBroadcast | AcceptMulticast | AcceptMyPhys | AcceptAllPhys));
+
+    switch (tp->mcfg) {
+    case CFG_METHOD_2:
+    case CFG_METHOD_3:
+    case CFG_METHOD_4:
+    case CFG_METHOD_5:
+        //rtl8125_dash2_disable_txrx(tp);
+        break;
+    }
+
+    //Disable realwow  function
+    switch (tp->mcfg) {
+    case CFG_METHOD_2:
+    case CFG_METHOD_3:
+    case CFG_METHOD_4:
+    case CFG_METHOD_5:
+        rtl8125_mac_ocp_write(tp, 0xC0BC, 0x00FF);
+        break;
+    }
+
+    rtl8125_nic_reset(tp);
+
+    switch (tp->mcfg) {
+    case CFG_METHOD_2:
+    case CFG_METHOD_3:
+    case CFG_METHOD_4:
+    case CFG_METHOD_5:
+        rtl8125_disable_now_is_oob(tp);
+
+        data16 = rtl8125_mac_ocp_read(tp, 0xE8DE) & ~BIT_14;
+        rtl8125_mac_ocp_write(tp, 0xE8DE, data16);
+        rtl8125_wait_ll_share_fifo_ready(tp);
+
+        rtl8125_mac_ocp_write(tp, 0xC0AA, 0x07D0);
+        rtl8125_mac_ocp_write(tp, 0xC0A6, 0x01B5);
+        rtl8125_mac_ocp_write(tp, 0xC01E, 0x5555);
+
+        rtl8125_wait_ll_share_fifo_ready(tp);
+        break;
+    }
+
+    //wait ups resume (phy state 2)
+    switch (tp->mcfg) {
+    case CFG_METHOD_2:
+    case CFG_METHOD_3:
+    case CFG_METHOD_4:
+    case CFG_METHOD_5:
+        if (rtl8125_is_ups_resume(tp)) {
+            rtl8125_wait_phy_ups_resume(tp, 2);
+            rtl8125_clear_ups_resume_bit(tp);
+            rtl8125_clear_phy_ups_reg(tp);
+        }
+        break;
+    };
+    tp->phy_reg_anlpar = 0;
 }

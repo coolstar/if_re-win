@@ -16,6 +16,7 @@ typedef struct _RT_ADAPTER
     // MMIO
     PVOID MMIOAddress;
     SIZE_T MMIOSize;
+    BUS_INTERFACE_STANDARD PciConfig;
 
     NET_ADAPTER_LINK_LAYER_ADDRESS PermanentAddress;
     NET_ADAPTER_LINK_LAYER_ADDRESS CurrentAddress;
@@ -24,6 +25,19 @@ typedef struct _RT_ADAPTER
     UINT16 eeeCap;
 
     struct rtl8125_private linuxData;
+
+    //Receiver Data
+    UINT32 rxConfigReg;
+    UINT32 rxConfigMask;
+
+    UINT32 intrMask;
+
+    UINT16 intrMaskRxTx;
+    UINT16 intrMaskPoll;
+
+    //Flags
+    BOOLEAN wolCapable;
+
 } RT_ADAPTER, * PRT_ADAPTER;
 
 WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(RT_ADAPTER, RtGetAdapterContext);

@@ -1,5 +1,6 @@
 #include "precomp.h"
-
+#include <initguid.h>
+#include <wdmguid.h>
 #include "trace.h"
 #include "device.h"
 #include "adapter.h"
@@ -58,6 +59,15 @@ RtGetResources(
     }
 
     adapter->linuxData.mmio_addr = adapter->MMIOAddress;
+
+    WdfFdoQueryForInterface(adapter->WdfDevice,
+        &GUID_BUS_INTERFACE_STANDARD,
+        (PINTERFACE)&adapter->PciConfig,
+        sizeof(BUS_INTERFACE_STANDARD),
+        1, // Version
+        NULL); //InterfaceSpecificData
+    if (!NT_SUCCESS(status))
+        goto Exit;
 
 Exit:
     TraceExitResult(status);
