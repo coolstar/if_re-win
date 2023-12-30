@@ -109,7 +109,7 @@ static const int multicast_filter_limit = 32;
 #define _R(NAME,MAC,RCR,MASK, JumFrameSz) \
 { .name = NAME, .mcfg = MAC, .RCR_Cfg = RCR, .RxConfigMask = MASK, .jumbo_frame_sz = JumFrameSz }
 
-const struct RTLChipInfo rtl_chip_info[] = {
+extern "C" const struct RTLChipInfo rtl_chip_info[] = {
     _R("RTL8125A",
        CFG_METHOD_2,
        BIT_30 | EnableInnerVlan | EnableOuterVlan | (RX_DMA_BURST << RxCfgDMAShift),

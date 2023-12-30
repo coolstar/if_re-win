@@ -10,7 +10,7 @@
 #define ReadReg16(reg)          RTL_R16((tp), (reg))
 #define ReadReg32(reg)          RTL_R32((tp), (reg))
 
-extern const struct RTLChipInfo rtl_chip_info[];
+extern "C" const struct RTLChipInfo rtl_chip_info[];
 
 UINT8 ConfigRead8(_In_ RT_ADAPTER* adapter, UINT32 reg) {
     UINT8 val;
@@ -414,8 +414,9 @@ NTSTATUS RtlInitHw(_In_ RT_ADAPTER* adapter)
     adapter->rxConfigMask = rtl_chip_info[tp->chipset].RxConfigMask;
 
     /* Reset the tally counter. */
-    WriteReg32(CounterAddrHigh, (adapter->statPhyAddr >> 32));
-    WriteReg32(CounterAddrLow, (adapter->statPhyAddr & 0x00000000ffffffff) | CounterReset);
+    /*WriteReg32(CounterAddrHigh, (adapter->statPhyAddr >> 32));
+    WriteReg32(CounterAddrLow, (adapter->statPhyAddr & 0x00000000ffffffff) | CounterReset);*/
+    //TODO: Enable tally counter
 
     rtl8125_disable_rxdvgate(tp);
 
