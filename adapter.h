@@ -1,5 +1,7 @@
 #pragma once
 
+#include "LucyRTL8125Linux-900501.hpp"
+
 typedef struct _RT_ADAPTER
 {
     // WDF handles associated with this context
@@ -10,6 +12,8 @@ typedef struct _RT_ADAPTER
     WDFSPINLOCK Lock;
 
     WDFDMAENABLER DmaEnabler;
+
+    struct rtl8125_private linuxData;
 
     NET_ADAPTER_LINK_LAYER_ADDRESS PermanentAddress;
     NET_ADAPTER_LINK_LAYER_ADDRESS CurrentAddress;
