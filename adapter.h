@@ -13,14 +13,17 @@ typedef struct _RT_ADAPTER
 
     WDFDMAENABLER DmaEnabler;
 
-    struct rtl8125_private linuxData;
-
     // MMIO
     PVOID MMIOAddress;
     SIZE_T MMIOSize;
 
     NET_ADAPTER_LINK_LAYER_ADDRESS PermanentAddress;
     NET_ADAPTER_LINK_LAYER_ADDRESS CurrentAddress;
+    NET_ADAPTER_LINK_LAYER_ADDRESS FallbackAddress;
+
+    UINT16 eeeCap;
+
+    struct rtl8125_private linuxData;
 } RT_ADAPTER, * PRT_ADAPTER;
 
 WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(RT_ADAPTER, RtGetAdapterContext);
