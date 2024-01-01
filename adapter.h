@@ -54,3 +54,5 @@ RtInitializeAdapterContext(
 NTSTATUS
 RtAdapterStart(
     _In_ RT_ADAPTER* adapter);
+
+NTSTATUS RtlInitHw(_In_ RT_ADAPTER* adapter);

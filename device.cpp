@@ -135,6 +135,10 @@ RtInitializeHardware(
         RtRegisterScatterGatherDma(adapter),
         TraceLoggingRtAdapter(adapter));
 
+    GOTO_IF_NOT_NT_SUCCESS(Exit, status,
+        RtlInitHw(adapter),
+        TraceLoggingRtAdapter(adapter));
+
     {
         //Temp for barebones init
 

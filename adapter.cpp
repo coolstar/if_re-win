@@ -113,14 +113,6 @@ RtAdapterStart(
         NetAdapterSetLinkLayerCapabilities(adapter->NetAdapter, &linkLayerCapabilities);
         NetAdapterSetLinkLayerMtuSize(adapter->NetAdapter, RT_MAX_PACKET_SIZE - ETH_LENGTH_OF_HEADER);
 
-        for (ULONG i = 0; i < ETHERNET_ADDRESS_LENGTH; i++)
-        {
-            adapter->PermanentAddress.Address[i] = i;
-        }
-        adapter->PermanentAddress.Length = ETHERNET_ADDRESS_LENGTH;
-
-        RtlCopyMemory(&adapter->CurrentAddress, &adapter->PermanentAddress, sizeof(adapter->PermanentAddress));
-
         NetAdapterSetPermanentLinkLayerAddress(adapter->NetAdapter, &adapter->PermanentAddress);
         NetAdapterSetCurrentLinkLayerAddress(adapter->NetAdapter, &adapter->CurrentAddress);
     }
