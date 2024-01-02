@@ -195,6 +195,7 @@
     <ClInclude Include="ethertool.h" />
     <ClInclude Include="forward.h" />
     <ClInclude Include="if_ether.h" />
+    <ClInclude Include="interrupt.h" />
     <ClInclude Include="linux.h" />
     <ClInclude Include="LucyRTL8125Linux-900501.hpp" />
     <ClInclude Include="mii.h" />
@@ -211,6 +212,7 @@
     <ClCompile Include="adapter.cpp" />
     <ClCompile Include="device.cpp" />
     <ClCompile Include="driver.cpp" />
+    <ClCompile Include="interrupt.cpp" />
     <ClCompile Include="LucyRTL8125Linux-900501.cpp">
       <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">stdcpp20</LanguageStandard>
       <LanguageStandard Condition="'$(Configuration)|$(Platform)'=='Release|x64'">stdcpp20</LanguageStandard>

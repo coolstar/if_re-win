@@ -18,6 +18,9 @@ typedef struct _RT_ADAPTER
     SIZE_T MMIOSize;
     BUS_INTERFACE_STANDARD PciConfig;
 
+    // Pointer to interrupt object
+    RT_INTERRUPT* Interrupt;
+
     NET_ADAPTER_LINK_LAYER_ADDRESS PermanentAddress;
     NET_ADAPTER_LINK_LAYER_ADDRESS CurrentAddress;
     NET_ADAPTER_LINK_LAYER_ADDRESS FallbackAddress;

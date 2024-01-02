@@ -4,6 +4,7 @@
 #include "device.h"
 #include "adapter.h"
 #include "power.h"
+#include "interrupt.h"
 
 // {5D364AAF-5B49-41A0-9E03-D3CB2AA2E03E}
 TRACELOGGING_DEFINE_PROVIDER(
@@ -146,6 +147,9 @@ EvtDriverDeviceAdd(
 
     GOTO_IF_NOT_NT_SUCCESS(Exit, status,
         RtInitializeAdapterContext(adapter, wdfDevice, netAdapter));
+
+    GOTO_IF_NOT_NT_SUCCESS(Exit, status,
+        RtInterruptCreate(wdfDevice, adapter, &adapter->Interrupt));
 
 Exit:
     if (adapterInit != nullptr)
