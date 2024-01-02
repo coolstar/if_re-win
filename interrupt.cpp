@@ -3,6 +3,7 @@
 #include "interrupt.h"
 #include "adapter.h"
 #include "LucyRTL8125Linux-900501.hpp"
+#include "link.h"
 
 NTSTATUS
 RtInterruptCreate(
@@ -119,5 +120,6 @@ EvtInterruptDpc(
 
 	if (InterlockedExchange8(&interrupt->linkChg, FALSE)) {
 		DbgPrint("Link Changed!");
+		RtlCheckLinkStatus(adapter);
 	}
 }

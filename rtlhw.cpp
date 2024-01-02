@@ -53,10 +53,7 @@ void ConfigWrite16(_In_ RT_ADAPTER* adapter, UINT32 reg, UINT16 val) {
         sizeof(val));
 }
 
-
-void RtlSetupHw(_In_ RT_ADAPTER* adapter, UINT16 newIntrMitigate, BOOLEAN enableInterrupts);
 void setOffset79(_In_ RT_ADAPTER* adapter, UINT8 setting);
-void setPhyMedium(_In_ RT_ADAPTER* adapter);
 UINT8 csiFun0ReadByte(_In_ RT_ADAPTER* adapter, UINT32 addr);
 void csiFun0WriteByte(_In_ RT_ADAPTER* adapter, UINT32 addr, UINT8 value);
 void initPCIOffset99(_In_ RT_ADAPTER* adapter);
@@ -400,7 +397,7 @@ NTSTATUS RtlInitHw(_In_ RT_ADAPTER* adapter)
         rtl8125_rar_set(tp, macAddr);
     }
     else {
-        TraceLoggingWrite(RealtekTraceProvider, "Using fallback MAC.\n");
+        TraceLoggingWrite(RealtekTraceProvider, "Using fallback MAC.");
         rtl8125_rar_set(tp, adapter->FallbackAddress.Address);
     }
     for (i = 0; i < MAC_ADDR_LEN; i++) {
@@ -451,6 +448,8 @@ void RtlEnableHw(_In_ RT_ADAPTER* adapter) {
 
     adapter->intrMask = adapter->intrMaskRxTx;
 
+    adapter->deadlockWarn = 0;
+    adapter->needsUpdate = FALSE;
     adapter->polling = FALSE;
 
     exitOOB(adapter);
@@ -492,7 +491,7 @@ void RtlDisableHw(_In_ RT_ADAPTER* adapter) {
             NetAdapterAutoNegotiationFlagNone);
         NetAdapterSetLinkState(adapter->NetAdapter, &linkState);
 
-        TraceLoggingWrite(RealtekTraceProvider, "Link down\n");
+        TraceLoggingWrite(RealtekTraceProvider, "Link down");
     }
 
     TraceExit();
@@ -815,11 +814,11 @@ void setPhyMedium(_In_ RT_ADAPTER* adapter)
     /* Enable or disable EEE support according to selected medium. */
     if ((tp->eee_adv_t != 0) && (adapter->autoneg == AUTONEG_ENABLE)) {
         rtl8125_enable_eee(tp);
-        TraceLoggingWrite(RealtekTraceProvider, "Enable EEE support.\n");
+        TraceLoggingWrite(RealtekTraceProvider, "Enable EEE support.");
     }
     else {
         rtl8125_disable_eee(tp);
-        TraceLoggingWrite(RealtekTraceProvider, "Disable EEE support.\n");
+        TraceLoggingWrite(RealtekTraceProvider, "Disable EEE support.");
     }
     //Disable Giga Lite
     ClearEthPhyOcpBit(tp, 0xA428, BIT_9);
@@ -893,7 +892,7 @@ void setPhyMedium(_In_ RT_ADAPTER* adapter)
 void setOffset79(_In_ RT_ADAPTER* adapter, UINT8 setting) {
     UINT8 deviceControl;
 
-    TraceLoggingWrite(RealtekTraceProvider, "setOffset79() ===>\n");
+    TraceEntryNetAdapter(adapter);
 
     if (!(adapter->linuxData.hwoptimize & HW_PATCH_SOC_LAN)) {
         deviceControl = ConfigRead8(adapter, 0x79);
@@ -902,7 +901,7 @@ void setOffset79(_In_ RT_ADAPTER* adapter, UINT8 setting) {
         ConfigWrite8(adapter, 0x79, deviceControl);
     }
 
-    TraceLoggingWrite(RealtekTraceProvider, "setOffset79() <===\n");
+    TraceExit();
 }
 
 UINT8 csiFun0ReadByte(_In_ RT_ADAPTER* adapter, UINT32 addr) {
@@ -2192,7 +2191,7 @@ NTSTATUS setMulticastMode(_In_ RT_ADAPTER* adapter, BOOLEAN active) {
     active = FALSE;
     rtl8125_private* tp = &adapter->linuxData;
 
-    TraceLoggingWrite(RealtekTraceProvider, "setMulticastMode() ===>\n");
+    TraceEntryNetAdapter(adapter);
 
     if (active) {
         rxMode = (AcceptBroadcast | AcceptMulticast | AcceptMyPhys);
@@ -2209,7 +2208,7 @@ NTSTATUS setMulticastMode(_In_ RT_ADAPTER* adapter, BOOLEAN active) {
     WriteReg32(MAR0, mcFilter[0]);
     WriteReg32(MAR1, mcFilter[1]);
 
-    TraceLoggingWrite(RealtekTraceProvider, "setMulticastMode() <===\n");
+    TraceExit();
 
     return STATUS_SUCCESS;
 }

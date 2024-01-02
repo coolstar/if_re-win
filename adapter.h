@@ -25,12 +25,16 @@ typedef struct _RT_ADAPTER
     NET_ADAPTER_LINK_LAYER_ADDRESS CurrentAddress;
     NET_ADAPTER_LINK_LAYER_ADDRESS FallbackAddress;
 
+    //Statistics Data
+    UINT32 deadlockWarn;
+
     UINT32 mtu;
     UINT32 speed;
     UINT32 duplex;
     UINT16 flowCtl;
     UINT16 autoneg;
     UINT16 eeeCap;
+    UINT16 eeeMode;
 
     struct rtl8125_private linuxData;
 
@@ -51,6 +55,7 @@ typedef struct _RT_ADAPTER
     BOOLEAN multicastMode;
     BOOLEAN linkUp;
 
+    BOOLEAN needsUpdate;
     BOOLEAN wolCapable;
 
 } RT_ADAPTER, * PRT_ADAPTER;

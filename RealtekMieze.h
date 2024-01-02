@@ -1,24 +1,5 @@
 #pragma once
 
-enum
-{
-    MEDIUM_INDEX_AUTO = 0,
-    MEDIUM_INDEX_10HD,
-    MEDIUM_INDEX_10FD,
-    MEDIUM_INDEX_100HD,
-    MEDIUM_INDEX_100FD,
-    MEDIUM_INDEX_100FDFC,
-    MEDIUM_INDEX_1000FD,
-    MEDIUM_INDEX_1000FDFC,
-    MEDIUM_INDEX_100FDEEE,
-    MEDIUM_INDEX_100FDFCEEE,
-    MEDIUM_INDEX_1000FDEEE,
-    MEDIUM_INDEX_1000FDFCEEE,
-    MEDIUM_INDEX_2500FD,
-    MEDIUM_INDEX_2500FDFC,
-    MEDIUM_INDEX_COUNT
-};
-
 #define MBit 1000000ULL
 
 enum {
@@ -38,3 +19,6 @@ enum {
     kEEETypeYes = 1,
     kEEETypeCount
 };
+
+void setPhyMedium(_In_ RT_ADAPTER* adapter);
+void RtlSetupHw(_In_ RT_ADAPTER* adapter, UINT16 newIntrMitigate, BOOLEAN enableInterrupts);
