@@ -202,6 +202,7 @@
     <ClInclude Exclude="@(ClInclude)" Include="precomp.h" />
     <ClInclude Include="common.h" />
     <ClInclude Include="r8125_dash.h" />
+    <ClInclude Include="RealtekMieze.h" />
     <ClInclude Include="rxqueue.h" />
     <ClInclude Include="trace.h" />
     <ClInclude Include="txqueue.h" />

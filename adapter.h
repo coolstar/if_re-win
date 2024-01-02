@@ -22,6 +22,11 @@ typedef struct _RT_ADAPTER
     NET_ADAPTER_LINK_LAYER_ADDRESS CurrentAddress;
     NET_ADAPTER_LINK_LAYER_ADDRESS FallbackAddress;
 
+    UINT32 mtu;
+    UINT32 speed;
+    UINT32 duplex;
+    UINT16 flowCtl;
+    UINT16 autoneg;
     UINT16 eeeCap;
 
     struct rtl8125_private linuxData;
@@ -31,11 +36,18 @@ typedef struct _RT_ADAPTER
     UINT32 rxConfigMask;
 
     UINT32 intrMask;
+    UINT16 intrMitigateValue;
 
     UINT16 intrMaskRxTx;
     UINT16 intrMaskPoll;
 
+    BOOLEAN polling;
+
     //Flags
+    BOOLEAN isEnabled;
+    BOOLEAN multicastMode;
+    BOOLEAN linkUp;
+
     BOOLEAN wolCapable;
 
 } RT_ADAPTER, * PRT_ADAPTER;
@@ -56,3 +68,5 @@ RtAdapterStart(
     _In_ RT_ADAPTER* adapter);
 
 NTSTATUS RtlInitHw(_In_ RT_ADAPTER* adapter);
+void RtlEnableHw(_In_ RT_ADAPTER* adapter);
+void RtlDisableHw(_In_ RT_ADAPTER* adapter);

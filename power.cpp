@@ -21,6 +21,7 @@ EvtDeviceD0Entry(
     {
         // We're coming back from low power, undo what
         // we did in EvtDeviceD0Exit
+        RtlEnableHw(adapter);
     }
 
     TraceExitResult(STATUS_SUCCESS);
@@ -40,16 +41,7 @@ EvtDeviceD0Exit(
 
     if (TargetState != WdfPowerDeviceD3Final)
     {
-        NET_ADAPTER_LINK_STATE linkState;
-        NET_ADAPTER_LINK_STATE_INIT(
-            &linkState,
-            NDIS_LINK_SPEED_UNKNOWN,
-            MediaConnectStateUnknown,
-            MediaDuplexStateUnknown,
-            NetAdapterPauseFunctionTypeUnknown,
-            NetAdapterAutoNegotiationFlagNone);
-
-        NetAdapterSetLinkState(adapter->NetAdapter, &linkState);
+        RtlDisableHw(adapter);
     }
 
     TraceExitResult(STATUS_SUCCESS);

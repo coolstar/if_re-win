@@ -4,6 +4,7 @@
 #include "trace.h"
 #include "device.h"
 #include "adapter.h"
+#include "RealtekMieze.h"
 
 NTSTATUS
 RtGetResources(
@@ -139,19 +140,7 @@ RtInitializeHardware(
         RtlInitHw(adapter),
         TraceLoggingRtAdapter(adapter));
 
-    {
-        //Temp for barebones init
-
-        NET_ADAPTER_LINK_STATE linkState;
-        NET_ADAPTER_LINK_STATE_INIT(
-            &linkState,
-            NDIS_LINK_SPEED_UNKNOWN,
-            MediaConnectStateDisconnected,
-            MediaDuplexStateUnknown,
-            NetAdapterPauseFunctionTypeUnknown,
-            NetAdapterAutoNegotiationFlagNone);
-        NetAdapterSetLinkState(adapter->NetAdapter, &linkState);
-    }
+    RtlEnableHw(adapter);
 
     GOTO_IF_NOT_NT_SUCCESS(Exit, status,
         RtAdapterStart(adapter));
@@ -172,11 +161,26 @@ EvtDevicePrepareHardware(
 
     TraceEntryRtAdapter(adapter);
 
+    adapter->isEnabled = FALSE;
+    adapter->multicastMode = FALSE;
+    adapter->linkUp = FALSE;
+
+    adapter->polling = FALSE;
+
+    adapter->mtu = ETH_DATA_LEN;
+    adapter->speed = 0;
+    adapter->duplex = DUPLEX_FULL;
+    adapter->autoneg = AUTONEG_ENABLE;
+    adapter->flowCtl = kFlowControlOff;
+    adapter->eeeCap = 0;
+
     adapter->linuxData.configASPM = 0;
     adapter->linuxData.configEEE = 0;
     adapter->linuxData.s0MagicPacket = 0;
     adapter->linuxData.hwoptimize = 0;
     adapter->linuxData.DASH = 0;
+
+    adapter->intrMitigateValue = 0x5f51;
 
     NTSTATUS status = STATUS_SUCCESS;
     GOTO_IF_NOT_NT_SUCCESS(Exit, status, RtInitializeHardware(adapter, resourcesRaw, resourcesTranslated));
