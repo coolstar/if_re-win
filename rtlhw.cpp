@@ -277,6 +277,9 @@ NTSTATUS RtlInitHw(_In_ RT_ADAPTER* adapter)
     if (tp->HwSuppTxNoCloseVer > 0)
         tp->EnableTxNoClose = TRUE;
 
+    //Don't enable this
+    tp->EnableTxNoClose = FALSE;
+
     switch (tp->mcfg) {
     case CFG_METHOD_2:
     case CFG_METHOD_3:

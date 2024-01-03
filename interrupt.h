@@ -9,8 +9,6 @@ typedef struct _RT_INTERRUPT
     LONG RxNotifyArmed[R8125_MAX_RX_QUEUES];
     LONG TxNotifyArmed;
 
-    INT64 TxCount;
-
     char pciInterrupt;
     char rxInterrupt;
     char txInterrupt;

@@ -122,8 +122,6 @@ EvtInterruptDpc(
 	}
 
 	if (InterlockedExchange8(&interrupt->txInterrupt, FALSE)) {
-		DbgPrint("TX Interrupt! %lld\n", InterlockedAdd64(&interrupt->TxCount, 1));
-
 		if (InterlockedExchange(&interrupt->TxNotifyArmed, false)) {
 			NetTxQueueNotifyMoreCompletedPacketsAvailable(adapter->TxQueues[0]);
 		}

@@ -186,9 +186,6 @@ RtPostTxDescriptor(
     txd->opts1 |= DescOwn;
     txd->opts2 = 0; //TODO: VLAN
 
-    rtl8125_private* tp = &tx->Adapter->linuxData;
-    DbgPrint("Tx Idx: %d, Buf: %d, Hw Idx: %d\n", tx->TxDescIndex, (UINT32)fragment->ValidLength, RTL_R16(tp, HW_CLO_PTR0_8125));
-
     if (tcb->NumTxDesc == 0) {
         txd->opts1 |= FirstFrag;
     }
@@ -221,9 +218,8 @@ RtFlushTransation(
 
     rtl8125_private* tp = &tx->Adapter->linuxData;
 
-    DbgPrint("HW Ptr: %d. TxDesc: %d\n", RTL_R16(tp, HW_CLO_PTR0_8125), tx->TxDescIndex);
-
-    RTL_W16(tp, SW_TAIL_PTR0_8125, tx->TxDescIndex & 0xffff);
+    RTL_W16(tp, TPPOLL_8125, tx->Priority);
+    //RTL_W16(tp, SW_TAIL_PTR0_8125, tx->TxDescIndex & 0xffff);
 }
 
 static
