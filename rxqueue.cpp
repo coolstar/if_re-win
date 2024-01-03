@@ -249,6 +249,8 @@ EvtRxQueueStart(
 
     //RtAdapterUpdateRcr(adapter);
 
+    RtlEnableHw(adapter);
+
     WdfSpinLockRelease(adapter->Lock);
 }
 
@@ -309,6 +311,8 @@ EvtRxQueueSetNotificationEnabled(
     TraceEntry(TraceLoggingPointer(rxQueue), TraceLoggingBoolean(notificationEnabled));
 
     RT_RXQUEUE* rx = RtGetRxQueueContext(rxQueue);
+
+    RtRxQueueSetInterrupt(rx, notificationEnabled);
 
     TraceExit();
 }

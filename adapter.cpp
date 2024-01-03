@@ -5,6 +5,7 @@
 #include "trace.h"
 #include "device.h"
 #include "adapter.h"
+#include "RealtekMieze.h"
 
 NTSTATUS
 RtInitializeAdapterContext(
@@ -113,7 +114,7 @@ RtAdapterSetDatapathCapabilities(
         &txDmaCapabilities,
         1);
 
-    txCapabilities.FragmentRingNumberOfElementsHint = RT_MIN_TCB * RT_MAX_PHYS_BUF_COUNT;
+    txCapabilities.FragmentRingNumberOfElementsHint = kNumTxDesc;
     txCapabilities.MaximumNumberOfFragments = RT_MAX_PHYS_BUF_COUNT;
 
     NET_ADAPTER_DMA_CAPABILITIES rxDmaCapabilities;
@@ -123,11 +124,11 @@ RtAdapterSetDatapathCapabilities(
     NET_ADAPTER_RX_CAPABILITIES_INIT_SYSTEM_MANAGED_DMA(
         &rxCapabilities,
         &rxDmaCapabilities,
-        RT_MAX_PACKET_SIZE + FRAME_CRC_SIZE + RSVD_BUF_SIZE,
+        kRxBufferPktSize,
         1);
 
-    rxCapabilities.FragmentBufferAlignment = 64;
-    rxCapabilities.FragmentRingNumberOfElementsHint = 32;
+    rxCapabilities.FragmentBufferAlignment = 16;
+    rxCapabilities.FragmentRingNumberOfElementsHint = kNumRxDesc;
 
     NetAdapterSetDataPathCapabilities(adapter->NetAdapter, &txCapabilities, &rxCapabilities);
 

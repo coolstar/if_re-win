@@ -140,8 +140,6 @@ RtInitializeHardware(
         RtlInitHw(adapter),
         TraceLoggingRtAdapter(adapter));
 
-    RtlEnableHw(adapter);
-
     GOTO_IF_NOT_NT_SUCCESS(Exit, status,
         RtAdapterStart(adapter));
 

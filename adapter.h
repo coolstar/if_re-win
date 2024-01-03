@@ -86,3 +86,4 @@ RtAdapterStart(
 NTSTATUS RtlInitHw(_In_ RT_ADAPTER* adapter);
 void RtlEnableHw(_In_ RT_ADAPTER* adapter);
 void RtlDisableHw(_In_ RT_ADAPTER* adapter);
+void RtlRestartHw(_In_ RT_ADAPTER* adapter);

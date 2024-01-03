@@ -3,6 +3,8 @@
 #include "RealtekMieze.h"
 #include "LucyRTL8125Linux-900501.hpp"
 #include "trace.h"
+#include "rxqueue.h"
+#include "txqueue.h"
 
 #define WriteReg8(reg, val8)    RTL_W8((tp), (reg), (val8))
 #define WriteReg16(reg, val16)  RTL_W16((tp), (reg), (val16))
@@ -497,6 +499,11 @@ void RtlDisableHw(_In_ RT_ADAPTER* adapter) {
     TraceExit();
 }
 
+void RtlRestartHw(_In_ RT_ADAPTER* adapter) {
+    RtlDisableHw(adapter);
+    RtlEnableHw(adapter);
+}
+
 void RtlSetupHw(_In_ RT_ADAPTER* adapter, UINT16 newIntrMitigate, BOOLEAN enableInterrupts) {
     TraceEntryNetAdapter(adapter);
 
@@ -564,12 +571,18 @@ void RtlSetupHw(_In_ RT_ADAPTER* adapter, UINT16 newIntrMitigate, BOOLEAN enable
     /*txTailPtr0 = txClosePtr0 = 0;
     txNextDescIndex = txDirtyDescIndex = 0;
     txNumFreeDesc = kNumTxDesc;
-    rxNextDescIndex = 0;
+    rxNextDescIndex = 0;*/
 
-    WriteReg32(TxDescStartAddrLow, (adapter->txPhyAddr & 0x00000000ffffffff));
-    WriteReg32(TxDescStartAddrHigh, (adapter->txPhyAddr >> 32));
-    WriteReg32(RxDescAddrLow, (adapter->rxPhyAddr & 0x00000000ffffffff));
-    WriteReg32(RxDescAddrHigh, (adapter->rxPhyAddr >> 32));*/
+    RT_TXQUEUE* txQueue = RtGetTxQueueContext(adapter->TxQueues[0]);
+    PHYSICAL_ADDRESS txPhyAddr = WdfCommonBufferGetAlignedLogicalAddress(txQueue->TxdArray);
+
+    RT_RXQUEUE* rxQueue = RtGetRxQueueContext(adapter->RxQueues[0]);
+    PHYSICAL_ADDRESS rxPhyAddr = WdfCommonBufferGetAlignedLogicalAddress(rxQueue->RxdArray);
+
+    WriteReg32(TxDescStartAddrLow, txPhyAddr.LowPart);
+    WriteReg32(TxDescStartAddrHigh, txPhyAddr.HighPart);
+    WriteReg32(RxDescAddrLow, rxPhyAddr.LowPart);
+    WriteReg32(RxDescAddrHigh, rxPhyAddr.HighPart);
 
     /* Set DMA burst size and Interframe Gap Time */
     WriteReg32(TxConfig, (TX_DMA_BURST_unlimited << TxDMAShift) |
@@ -2193,6 +2206,7 @@ NTSTATUS setMulticastMode(_In_ RT_ADAPTER* adapter, BOOLEAN active) {
 
     TraceEntryNetAdapter(adapter);
 
+#if 0
     if (active) {
         rxMode = (AcceptBroadcast | AcceptMulticast | AcceptMyPhys);
         mcFilter[1] = mcFilter[0] = 0;
@@ -2203,6 +2217,12 @@ NTSTATUS setMulticastMode(_In_ RT_ADAPTER* adapter, BOOLEAN active) {
         rxMode = (AcceptBroadcast | AcceptMyPhys);
         mcFilter[1] = mcFilter[0] = 0;
     }
+#endif
+
+    //Promiscouous Mode
+    rxMode = (AcceptBroadcast | AcceptMulticast | AcceptMyPhys | AcceptAllPhys);
+    mcFilter[1] = mcFilter[0] = 0xffffffff;
+
     adapter->multicastMode = active;
     rxMode |= adapter->rxConfigReg | (ReadReg32(RxConfig) & adapter->rxConfigMask);
     WriteReg32(RxConfig, rxMode);

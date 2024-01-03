@@ -62,6 +62,7 @@ EvtInterruptIsr(
 
 	RTL_W32(tp, IMR0_8125, 0x0000);
 	RTL_W32(tp, ISR0_8125, (status & ~RxFIFOOver));
+	RTL_W32(tp, IMR0_8125, adapter->intrMask);
 
 	if (status & SYSErr) {
 		if (!InterlockedExchange8(&interrupt->pciInterrupt, TRUE))
@@ -85,11 +86,7 @@ EvtInterruptIsr(
 			queueDPC = TRUE;
 	}
 
-	//TODO: Link
-	DbgPrint("Got Interrupt!\n");
-
 done:
-	RTL_W32(tp, IMR0_8125, adapter->intrMask);
 	if (queueDPC)
 		WdfInterruptQueueDpcForIsr(wdfInterrupt);
 	return true;
@@ -125,19 +122,18 @@ EvtInterruptDpc(
 	}
 
 	if (InterlockedExchange8(&interrupt->txInterrupt, FALSE)) {
-		DbgPrint("TX Interrupt!");
+		DbgPrint("TX Interrupt! %lld\n", InterlockedAdd64(&interrupt->TxCount, 1));
+
 		if (InterlockedExchange(&interrupt->TxNotifyArmed, false)) {
 			NetTxQueueNotifyMoreCompletedPacketsAvailable(adapter->TxQueues[0]);
 		}
 	}
 
 	if (InterlockedExchange8(&interrupt->rxInterrupt, FALSE)) {
-		DbgPrint("RX Interrupt!");
 		RtRxNotify(interrupt, 0);
 	}
 
 	if (InterlockedExchange8(&interrupt->linkChg, FALSE)) {
-		DbgPrint("Link Changed!");
 		RtlCheckLinkStatus(adapter);
 	}
 }
