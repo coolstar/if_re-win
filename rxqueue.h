@@ -2,10 +2,13 @@
 
 typedef struct _RT_RXQUEUE {
 	RT_ADAPTER* Adapter;
+	RT_INTERRUPT* Interrupt;
 
 	NET_RING_COLLECTION const* Rings;
 
 	WDFCOMMONBUFFER RxdArray;
+	RtlRxDesc* RxdBase;
+	size_t RxdSize;
 
 	NET_EXTENSION ChecksumExtension;
 	NET_EXTENSION VirtualAddressExtension;

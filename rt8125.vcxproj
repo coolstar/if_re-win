@@ -200,6 +200,7 @@
     <ClInclude Include="linux.h" />
     <ClInclude Include="LucyRTL8125Linux-900501.hpp" />
     <ClInclude Include="mii.h" />
+    <ClInclude Include="netringiterator.h" />
     <ClInclude Include="power.h" />
     <ClInclude Exclude="@(ClInclude)" Include="precomp.h" />
     <ClInclude Include="common.h" />

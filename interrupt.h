@@ -5,6 +5,10 @@ typedef struct _RT_INTERRUPT
     RT_ADAPTER* Adapter;
     WDFINTERRUPT Handle;
 
+    // Armed Notifications
+    LONG RxNotifyArmed[R8125_MAX_RX_QUEUES];
+    LONG TxNotifyArmed;
+
     char pciInterrupt;
     char rxInterrupt;
     char txInterrupt;

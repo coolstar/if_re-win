@@ -2,11 +2,19 @@
 
 #include "LucyRTL8125Linux-900501.hpp"
 
+#define R8125_MAX_TX_QUEUES (2)
+#define R8125_MAX_RX_QUEUES (4)
+#define R8125_MAX_QUEUES R8125_MAX_RX_QUEUES
+
 typedef struct _RT_ADAPTER
 {
     // WDF handles associated with this context
     NETADAPTER NetAdapter;
     WDFDEVICE WdfDevice;
+
+    //Handle to default Tx and Rx Queues
+    NETPACKETQUEUE TxQueues[R8125_MAX_TX_QUEUES];
+    NETPACKETQUEUE RxQueues[R8125_MAX_RX_QUEUES];
 
     // spin locks
     WDFSPINLOCK Lock;

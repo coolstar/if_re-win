@@ -1,7 +1,7 @@
 #include "precomp.h"
 #include "trace.h"
-#include "interrupt.h"
 #include "adapter.h"
+#include "interrupt.h"
 #include "LucyRTL8125Linux-900501.hpp"
 #include "link.h"
 
@@ -95,6 +95,20 @@ done:
 	return true;
 }
 
+static
+void
+RtRxNotify(
+	_In_ RT_INTERRUPT* interrupt,
+	_In_ ULONG queueId
+)
+{
+	if (InterlockedExchange(&interrupt->RxNotifyArmed[queueId], false))
+	{
+		NetRxQueueNotifyMoreReceivedPacketsAvailable(
+			interrupt->Adapter->RxQueues[queueId]);
+	}
+}
+
 _Use_decl_annotations_
 VOID
 EvtInterruptDpc(
@@ -112,10 +126,14 @@ EvtInterruptDpc(
 
 	if (InterlockedExchange8(&interrupt->txInterrupt, FALSE)) {
 		DbgPrint("TX Interrupt!");
+		if (InterlockedExchange(&interrupt->TxNotifyArmed, false)) {
+			NetTxQueueNotifyMoreCompletedPacketsAvailable(adapter->TxQueues[0]);
+		}
 	}
 
 	if (InterlockedExchange8(&interrupt->rxInterrupt, FALSE)) {
 		DbgPrint("RX Interrupt!");
+		RtRxNotify(interrupt, 0);
 	}
 
 	if (InterlockedExchange8(&interrupt->linkChg, FALSE)) {

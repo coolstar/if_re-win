@@ -2188,13 +2188,14 @@ NTSTATUS setMulticastMode(_In_ RT_ADAPTER* adapter, BOOLEAN active) {
     //UINT32* filterAddr = (UInt32*)&multicastFilter;
     UINT32 mcFilter[2];
     UINT32 rxMode;
-    active = FALSE;
+    active = TRUE;
     rtl8125_private* tp = &adapter->linuxData;
 
     TraceEntryNetAdapter(adapter);
 
     if (active) {
         rxMode = (AcceptBroadcast | AcceptMulticast | AcceptMyPhys);
+        mcFilter[1] = mcFilter[0] = 0;
         /*mcFilter[0] = *filterAddr++;
         mcFilter[1] = *filterAddr;*/
     }
