@@ -69,8 +69,8 @@ RtAdapterSetDatapathCapabilities(
         &txDmaCapabilities,
         1);
 
-    txCapabilities.FragmentRingNumberOfElementsHint = RT_MIN_TCB * RT_MAX_PHYS_BUF_COUNT;
-    txCapabilities.MaximumNumberOfFragments = RT_MAX_PHYS_BUF_COUNT;
+    txCapabilities.FragmentRingNumberOfElementsHint = RE_TX_BUF_NUM;
+    txCapabilities.MaximumNumberOfFragments = RE_NTXSEGS;
 
     NET_ADAPTER_DMA_CAPABILITIES rxDmaCapabilities;
     NET_ADAPTER_DMA_CAPABILITIES_INIT(&rxDmaCapabilities, adapter->DmaEnabler);
@@ -79,11 +79,11 @@ RtAdapterSetDatapathCapabilities(
     NET_ADAPTER_RX_CAPABILITIES_INIT_SYSTEM_MANAGED_DMA(
         &rxCapabilities,
         &rxDmaCapabilities,
-        RT_MAX_PACKET_SIZE + FRAME_CRC_SIZE + RSVD_BUF_SIZE,
+        RE_BUF_SIZE,
         1);
 
-    rxCapabilities.FragmentBufferAlignment = 64;
-    rxCapabilities.FragmentRingNumberOfElementsHint = 32;
+    rxCapabilities.FragmentBufferAlignment = RE_RX_BUFFER_ALIGN;
+    rxCapabilities.FragmentRingNumberOfElementsHint = RE_RX_BUF_NUM;
 
     NetAdapterSetDataPathCapabilities(adapter->NetAdapter, &txCapabilities, &rxCapabilities);
 

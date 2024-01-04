@@ -584,7 +584,6 @@ struct re_stats {
 union RxDesc {
     u_int32_t	ul[4];
     struct {
-#if defined(_LITTLE_ENDIAN)
         u_int32_t Frame_Length : 14;
         u_int32_t TCPF : 1;
         u_int32_t UDPF : 1;
@@ -607,32 +606,6 @@ union RxDesc {
         u_int32_t VLAN_TAG : 16;
         u_int32_t TAVA : 1;
         u_int32_t RESV1 : 15;
-#elif defined(_BIG_ENDIAN)
-        u_int32_t OWN : 1;
-        u_int32_t EOR : 1;
-        u_int32_t FS : 1;
-        u_int32_t LS : 1;
-        u_int32_t MAR : 1;
-        u_int32_t PAM : 1;
-        u_int32_t BAR : 1;
-        u_int32_t RESV : 2;
-        u_int32_t RWT : 1;
-        u_int32_t RES : 1;
-        u_int32_t RUNT : 1;
-        u_int32_t CRC : 1;
-        u_int32_t UDPT : 1;
-        u_int32_t TCPT : 1;
-        u_int32_t IPF : 1;
-        u_int32_t UDPF : 1;
-        u_int32_t TCPF : 1;
-        u_int32_t Frame_Length : 14;
-
-        u_int32_t RESV1 : 15;
-        u_int32_t TAVA : 1;
-        u_int32_t VLAN_TAG : 16;
-#else
-#error  "what endian is this machine?"
-#endif
         u_int64_t RxBuff;
     } so0;	/* symbol owner=0 */
 };
@@ -640,7 +613,6 @@ union RxDesc {
 union TxDesc {
     u_int32_t	ul[4];
     struct {
-#if defined(_LITTLE_ENDIAN)
         u_int32_t Frame_Length : 16;
         u_int32_t TCPCS : 1;
         u_int32_t UDPCS : 1;
@@ -658,27 +630,6 @@ union TxDesc {
         u_int32_t TAGC0 : 1;
         u_int32_t TAGC1 : 1;
         u_int32_t RESV1 : 14;
-#elif defined(_BIG_ENDIAN)
-        u_int32_t OWN : 1;
-        u_int32_t EOR : 1;
-        u_int32_t FS : 1;
-        u_int32_t LS : 1;
-        u_int32_t LGSEN : 1;
-        u_int32_t TDMA : 1;
-        u_int32_t RESV : 6;
-        u_int32_t SCRC : 1;
-        u_int32_t IPCS : 1;
-        u_int32_t UDPCS : 1;
-        u_int32_t TCPCS : 1;
-        u_int32_t Frame_Length : 16;
-
-        u_int32_t RESV1 : 14;
-        u_int32_t TAGC1 : 1;
-        u_int32_t TAGC0 : 1;
-        u_int32_t VLAN_TAG : 16;
-#else
-#error  "what endian is this machine?"
-#endif
         u_int64_t TxBuff;
     } so1;	/* symbol owner=1 */
 };

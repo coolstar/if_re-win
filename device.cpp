@@ -78,7 +78,7 @@ RtRegisterScatterGatherDma(
     TraceEntryRtAdapter(adapter);
 
     WDF_DMA_ENABLER_CONFIG dmaEnablerConfig;
-    WDF_DMA_ENABLER_CONFIG_INIT(&dmaEnablerConfig, WdfDmaProfileScatterGather64, RT_MAX_PACKET_SIZE);
+    WDF_DMA_ENABLER_CONFIG_INIT(&dmaEnablerConfig, WdfDmaProfileScatterGather64, adapter->bsdData.max_jumbo_frame_size);
     dmaEnablerConfig.Flags |= WDF_DMA_ENABLER_CONFIG_REQUIRE_SINGLE_TRANSFER;
     dmaEnablerConfig.WdmDmaVersionOverride = 3;
 
@@ -128,10 +128,6 @@ RtInitializeHardware(
     GOTO_IF_NOT_NT_SUCCESS(Exit, status,
         RtGetResources(adapter, resourcesRaw, resourcesTranslated));
 
-    GOTO_IF_NOT_NT_SUCCESS(Exit, status,
-        RtRegisterScatterGatherDma(adapter),
-        TraceLoggingRtAdapter(adapter));
-
     RtlZeroMemory(&adapter->bsdData, sizeof(adapter->bsdData));
 
     adapter->bsdData.dev = adapter;
@@ -148,6 +144,11 @@ RtInitializeHardware(
         TraceLoggingRtAdapter(adapter));
 
     re_init_software_variable(&adapter->bsdData);
+
+    GOTO_IF_NOT_NT_SUCCESS(Exit, status,
+        RtRegisterScatterGatherDma(adapter),
+        TraceLoggingRtAdapter(adapter));
+
     re_exit_oob(&adapter->bsdData);
     re_hw_init(&adapter->bsdData);
 
