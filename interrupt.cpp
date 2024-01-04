@@ -136,13 +136,13 @@ EvtInterruptDpc(
 		DbgPrint("PCI Interrupt!");
 	}
 
-	/*if (InterlockedExchange8(&interrupt->txInterrupt, FALSE)) {
+	if (InterlockedExchange8(&interrupt->txInterrupt, FALSE)) {
 		if (InterlockedExchange(&interrupt->TxNotifyArmed, false)) {
 			NetTxQueueNotifyMoreCompletedPacketsAvailable(adapter->TxQueues[0]);
 		}
 	}
 
-	if (InterlockedExchange8(&interrupt->rxInterrupt, FALSE)) {
+	/*if (InterlockedExchange8(&interrupt->rxInterrupt, FALSE)) {
 		RtRxNotify(interrupt, 0);
 	}*/
 

@@ -1,9 +1,10 @@
 #include "precomp.h"
 
-#include "rxqueue.h"
 #include "device.h"
 #include "trace.h"
 #include "adapter.h"
+#include "rxqueue.h"
+#include "interrupt.h"
 
 _Use_decl_annotations_
 NTSTATUS
@@ -93,7 +94,21 @@ RtRxQueueInitialize(
     RT_RXQUEUE* rx = RtGetRxQueueContext(rxQueue);
 
     rx->Adapter = adapter;
+    rx->Interrupt = adapter->Interrupt;
     rx->Rings = NetRxQueueGetRingCollection(rxQueue);
+
+    // allocate descriptors
+    NET_RING* pr = NetRingCollectionGetPacketRing(rx->Rings);
+    UINT32 const rxdSize = pr->NumberOfElements * sizeof(RxDesc);
+    GOTO_IF_NOT_NT_SUCCESS(Exit, status,
+        WdfCommonBufferCreate(
+            rx->Adapter->DmaEnabler,
+            rxdSize,
+            WDF_NO_OBJECT_ATTRIBUTES,
+            &rx->RxdArray));
+
+    rx->RxdBase = static_cast<RxDesc*>(WdfCommonBufferGetAlignedVirtualAddress(rx->RxdArray));
+    rx->RxdSize = rxdSize;
 
 Exit:
     return status;

@@ -54,6 +54,48 @@ Exit:
 
 }
 
+static EVT_NET_ADAPTER_SET_RECEIVE_FILTER AdapterSetReceiveFilter;
+static void
+RtSetReceiveFilter(
+    _In_ NETADAPTER netAdapter,
+    _In_ NETRECEIVEFILTER receiveFilter)
+{
+    TraceEntryNetAdapter(netAdapter);
+    RT_ADAPTER* adapter = RtGetAdapterContext(netAdapter);
+
+    // PASSIVE_LEVEL, nonpaged (resume path)
+    NET_PACKET_FILTER_FLAGS flags = NetReceiveFilterGetPacketFilter(receiveFilter);
+    size_t mcastCount = (flags & NetPacketFilterFlagMulticast)
+        ? NetReceiveFilterGetMulticastAddressCount(receiveFilter)
+        : 0;
+    const NET_ADAPTER_LINK_LAYER_ADDRESS* mcast = mcastCount > 0 ?
+        NetReceiveFilterGetMulticastAddressList(receiveFilter)
+        : nullptr;
+
+    /*MacPacketFilter_t filter = {};
+    if (flags & NetPacketFilterFlagPromiscuous)
+    {
+        filter.PromiscuousMode = true;
+    }
+    else
+    {
+        filter.PassAllMulticast = 0 != (flags & NetPacketFilterFlagAllMulticast);
+        filter.DisableBroadcast = 0 == (flags & NetPacketFilterFlagBroadcast);
+        SetOneMacAddress(context->regs, 0, context->currentMacAddress,
+            0 != (flags & NetPacketFilterFlagDirected)); // Address[0] can't really be disabled...
+        // Could also use hash-based filtering for additional mcast support, but this seems okay.
+        auto const macAddrCount = context->feature0.MacAddrCount;
+        for (unsigned i = 1; i < macAddrCount; i += 1)
+        {
+            static constexpr UINT8 zero[ETHERNET_LENGTH_OF_ADDRESS] = {};
+            bool const enable = mcastCount > i - 1 && mcast[i - 1].Length >= ETHERNET_LENGTH_OF_ADDRESS;
+            auto const addr = enable ? mcast[i - 1].Address : zero;
+            SetOneMacAddress(context->regs, i, addr, enable);
+        }
+    }*/
+    TraceExit();
+}
+
 static
 void
 RtAdapterSetDatapathCapabilities(
@@ -87,6 +129,16 @@ RtAdapterSetDatapathCapabilities(
 
     NetAdapterSetDataPathCapabilities(adapter->NetAdapter, &txCapabilities, &rxCapabilities);
 
+    NET_ADAPTER_RECEIVE_FILTER_CAPABILITIES rxFilterCaps;
+    NET_ADAPTER_RECEIVE_FILTER_CAPABILITIES_INIT(&rxFilterCaps, RtSetReceiveFilter);
+    rxFilterCaps.SupportedPacketFilters =
+        NetPacketFilterFlagDirected |
+        NetPacketFilterFlagMulticast |
+        NetPacketFilterFlagAllMulticast |
+        NetPacketFilterFlagBroadcast |
+        NetPacketFilterFlagPromiscuous;
+    rxFilterCaps.MaximumMulticastAddresses = 1; // TODO: Packet filter.
+    NetAdapterSetReceiveFilterCapabilities(adapter->NetAdapter, &rxFilterCaps);
 }
 
 _Use_decl_annotations_

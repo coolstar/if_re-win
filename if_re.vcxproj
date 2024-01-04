@@ -200,6 +200,7 @@
     <ClInclude Include="interrupt.h" />
     <ClInclude Include="link.h" />
     <ClInclude Include="mii.h" />
+    <ClInclude Include="netringiterator.h" />
     <ClInclude Include="power.h" />
     <ClInclude Exclude="@(ClInclude)" Include="precomp.h" />
     <ClInclude Include="common.h" />

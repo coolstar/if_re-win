@@ -32,6 +32,10 @@ typedef struct _RT_ADAPTER
     NETADAPTER NetAdapter;
     WDFDEVICE WdfDevice;
 
+    //Handle to default Tx and Rx Queues
+    NETPACKETQUEUE TxQueues[RT_MAX_TX_QUEUES];
+    NETPACKETQUEUE RxQueues[RT_MAX_RX_QUEUES];
+
     // spin locks
     WDFSPINLOCK Lock;
 
