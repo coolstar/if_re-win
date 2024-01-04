@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include <intrin.h>
 
 // Driver Options
 
@@ -49,6 +50,16 @@
 #endif
 
 #define DBGPRINT1(dev, x, ...) DbgPrint(x, __VA_ARGS__)
+
+#if !defined(_ARM_) && !defined(_ARM64_)
+#define WRITE_REGISTER_NOFENCE_ULONG WRITE_REGISTER_ULONG
+#define WRITE_REGISTER_NOFENCE_USHORT WRITE_REGISTER_USHORT
+#define WRITE_REGISTER_NOFENCE_UCHAR WRITE_REGISTER_UCHAR
+
+#define READ_REGISTER_NOFENCE_ULONG READ_REGISTER_ULONG
+#define READ_REGISTER_NOFENCE_USHORT READ_REGISTER_USHORT
+#define READ_REGISTER_NOFENCE_UCHAR READ_REGISTER_UCHAR
+#endif
 
 /*
  * register space access macros
