@@ -16,6 +16,10 @@
 
 #include "forward.h"
 
+// Error log definitions
+#define ERRLOG_OUT_OF_SG_RESOURCES      0x00000409L
+#define ERRLOG_NO_MEMORY_RESOURCE       0x00000605L
+
 // max number of physical fragments supported per TCB
 #define RT_MAX_PHYS_BUF_COUNT 16
 
