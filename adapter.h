@@ -14,6 +14,7 @@ typedef struct _RT_ADAPTER
     // MMIO
     PVOID MMIOAddress;
     SIZE_T MMIOSize;
+    BUS_INTERFACE_STANDARD PciConfig;
 
     NET_ADAPTER_LINK_LAYER_ADDRESS PermanentAddress;
     NET_ADAPTER_LINK_LAYER_ADDRESS CurrentAddress;

@@ -1,5 +1,7 @@
 #include "precomp.h"
 
+#include <initguid.h>
+#include <wdmguid.h>
 #include "trace.h"
 #include "device.h"
 #include "adapter.h"
@@ -56,6 +58,15 @@ RtGetResources(
 
         GOTO_IF_NOT_NT_SUCCESS(Exit, status, STATUS_NDIS_RESOURCE_CONFLICT);
     }
+
+    WdfFdoQueryForInterface(adapter->WdfDevice,
+        &GUID_BUS_INTERFACE_STANDARD,
+        (PINTERFACE)&adapter->PciConfig,
+        sizeof(BUS_INTERFACE_STANDARD),
+        1, // Version
+        NULL); //InterfaceSpecificData
+    if (!NT_SUCCESS(status))
+        goto Exit;
 
 Exit:
     TraceExitResult(status);
