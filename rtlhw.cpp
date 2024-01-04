@@ -3213,13 +3213,13 @@ void re_init_software_variable(struct re_softc* sc)
 
     sc->re_8169_MacVersion = (CSR_READ_4(sc, RE_TXCFG) & 0x7c800000) >> 25;		/* Get bit 26~30 	*/
     sc->re_8169_MacVersion |= ((CSR_READ_4(sc, RE_TXCFG) & 0x00800000) != 0 ? 1 : 0);	/* Get bit 23 		*/
-    DBGPRINT1(sc->re_unit, "8169 Mac Version %d", sc->re_8169_MacVersion);
+    DBGPRINT1(sc->re_unit, "8169 Mac Version %d\n", sc->re_8169_MacVersion);
 
     /* Rtl8169s single chip detected */
     if (sc->re_type == MACFG_3) {
         RE_LOCK(sc);
         sc->re_8169_PhyVersion = (MP_ReadPhyUshort(sc, 0x03) & 0x000f);
-        DBGPRINT1(sc->re_unit, "8169 Phy Version %d", sc->re_8169_PhyVersion);
+        DBGPRINT1(sc->re_unit, "8169 Phy Version %d\n", sc->re_8169_PhyVersion);
         RE_UNLOCK(sc);
     }
 

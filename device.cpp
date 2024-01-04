@@ -176,21 +176,21 @@ RtInitializeHardware(
 
     switch (adapter->bsdData.re_device_id) {
     case RT_DEVICEID_8126:
-        adapter->MaxSpeed = 50000000000;
+        adapter->MaxSpeed = 5'000'000'000;
         break;
     case RT_DEVICEID_8125:
     case RT_DEVICEID_3000:
-        adapter->MaxSpeed = 25000000000;
+        adapter->MaxSpeed = 2'500'000'000;
         break;
     case RT_DEVICEID_8169:
     case RT_DEVICEID_8169SC:
     case RT_DEVICEID_8168:
     case RT_DEVICEID_8161:
     case RT_DEVICEID_8162:
-        adapter->MaxSpeed = 1000000000;
+        adapter->MaxSpeed = 1'000'000'000;
         break;
     default:
-        adapter->MaxSpeed = 100000000;
+        adapter->MaxSpeed = 100'000'000;
         break;
     }
 
