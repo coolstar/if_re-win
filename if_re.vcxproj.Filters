@@ -25,12 +25,12 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <Inf Include="rt8125.inx">
+    <Inf Include="if_re.inx">
       <Filter>Driver Files</Filter>
     </Inf>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="rt8125.rc">
+    <ResourceCompile Include="if_re.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>

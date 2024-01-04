@@ -4,7 +4,7 @@ Copyright (c) Microsoft Corporation All Rights Reserved
 
 Module Name:
 
-    rk3xgpio.rc
+    if_re.rc
 
 Abstract:
 
@@ -14,9 +14,9 @@ Abstract:
 
 #define VER_FILETYPE                VFT_DRV
 #define VER_FILESUBTYPE             VFT2_DRV_NETWORK
-#define VER_FILEDESCRIPTION_STR     "Realtek Gaming 2.5GbE Family Controller"
-#define VER_INTERNALNAME_STR        "rt8125.sys"
-#define VER_ORIGINALFILENAME_STR    "rt8125.sys"
+#define VER_FILEDESCRIPTION_STR     "Realtek Ethernet Family Controller"
+#define VER_INTERNALNAME_STR        "if_re.sys"
+#define VER_ORIGINALFILENAME_STR    "if_re.sys"
 
 #define VER_LEGALCOPYRIGHT_YEARS    "2023"
 #define VER_LEGALCOPYRIGHT_STR	    "Copyright (C) " VER_LEGALCOPYRIGHT_YEARS " CoolStar."
@@ -36,6 +36,6 @@ Abstract:
 #define VER_FILEOS				VOS_NT_WINDOWS32
 
 #define VER_COMPANYNAME_STR         "CoolStar"
-#define VER_PRODUCTNAME_STR         "Realtek 2.5GbE Ethernet"
+#define VER_PRODUCTNAME_STR         "Realtek Ethernet"
 
 #include "common.ver"

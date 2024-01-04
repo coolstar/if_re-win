@@ -93,25 +93,25 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" />
   </ImportGroup>
   <ItemGroup Label="WrappedTaskItems">
-    <Inf Include="rt8125.inx">
+    <Inf Include="if_re.inx">
       <DateStamp>*</DateStamp>
       <SpecifyDriverVerDirectiveDate>true</SpecifyDriverVerDirectiveDate>
       <Architecture>$(InfArch)</Architecture>
       <SpecifyArchitecture>true</SpecifyArchitecture>
-      <CopyOutput>.\$(IntDir)\rt8125.inf</CopyOutput>
+      <CopyOutput>.\$(IntDir)\if_re.inf</CopyOutput>
     </Inf>
   </ItemGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
-    <TargetName>rt8125</TargetName>
+    <TargetName>if_re</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <TargetName>rt8125</TargetName>
+    <TargetName>if_re</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM64'">
-    <TargetName>rt8125</TargetName>
+    <TargetName>if_re</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <TargetName>rt8125</TargetName>
+    <TargetName>if_re</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM64'">
     <Link>
@@ -178,7 +178,7 @@
     </DriverSign>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ResourceCompile Include="rt8125.rc" />
+    <ResourceCompile Include="if_re.rc" />
   </ItemGroup>
   <ItemGroup>
     <Inf Exclude="@(Inf)" Include="*.inf" />
