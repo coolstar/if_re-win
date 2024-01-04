@@ -165,6 +165,10 @@ EvtDevicePrepareHardware(
 
     TraceEntryRtAdapter(adapter);
 
+    adapter->bsdData.dev = adapter;
+    adapter->bsdData.mtu = ETHERMTU;
+    adapter->bsdData.eee_enable = 0;
+
     NTSTATUS status = STATUS_SUCCESS;
     GOTO_IF_NOT_NT_SUCCESS(Exit, status, RtInitializeHardware(adapter, resourcesRaw, resourcesTranslated));
 
