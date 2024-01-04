@@ -1,5 +1,7 @@
 #pragma once
 
+#include "if_re_bsd.h"
+
 typedef struct _RT_ADAPTER
 {
     // WDF handles associated with this context
@@ -15,6 +17,8 @@ typedef struct _RT_ADAPTER
     PVOID MMIOAddress;
     SIZE_T MMIOSize;
     BUS_INTERFACE_STANDARD PciConfig;
+
+    struct re_softc bsdData;
 
     NET_ADAPTER_LINK_LAYER_ADDRESS PermanentAddress;
     NET_ADAPTER_LINK_LAYER_ADDRESS CurrentAddress;

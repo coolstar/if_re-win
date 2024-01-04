@@ -191,8 +191,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="adapter.h" />
+    <ClInclude Include="bsd.h" />
     <ClInclude Include="device.h" />
     <ClInclude Include="forward.h" />
+    <ClInclude Include="if_re_bsd.h" />
     <ClInclude Include="power.h" />
     <ClInclude Exclude="@(ClInclude)" Include="precomp.h" />
     <ClInclude Include="common.h" />
@@ -205,6 +207,7 @@
     <ClCompile Include="device.cpp" />
     <ClCompile Include="driver.cpp" />
     <ClCompile Include="power.cpp" />
+    <ClCompile Include="rtlhw.cpp" />
     <ClCompile Include="rxqueue.cpp" />
     <ClCompile Include="txqueue.cpp" />
   </ItemGroup>
