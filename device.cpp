@@ -222,6 +222,13 @@ RtInitializeHardware(
     GOTO_IF_NOT_NT_SUCCESS(Exit, status,
         RtAdapterStart(adapter));
 
+    if (adapter->isRTL8125) {
+        re_hw_start_unlock_8125(sc);
+    }
+    else {
+        re_hw_start_unlock(sc);
+    }
+
 Exit:
     TraceExitResult(status);
     return status;

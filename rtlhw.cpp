@@ -3415,7 +3415,7 @@ static void re_set_eee_lpi_timer(struct re_softc* sc)
     }
 }
 
-static void re_hw_start_unlock(struct re_softc* sc)
+void re_hw_start_unlock(struct re_softc* sc)
 {
     u_int32_t		macver;
     u_int8_t		data8;
@@ -4984,7 +4984,7 @@ static void re_hw_start_unlock(struct re_softc* sc)
     CSR_WRITE_2(sc, RE_IMR, RE_INTRS);
 }
 
-static void re_hw_start_unlock_8125(struct re_softc* sc)
+void re_hw_start_unlock_8125(struct re_softc* sc)
 {
     u_int32_t		macver;
     u_int16_t		data16 = 0;

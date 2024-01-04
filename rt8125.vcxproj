@@ -197,6 +197,7 @@
     <ClInclude Include="ethernet.h" />
     <ClInclude Include="forward.h" />
     <ClInclude Include="if_re_bsd.h" />
+    <ClInclude Include="interrupt.h" />
     <ClInclude Include="mii.h" />
     <ClInclude Include="power.h" />
     <ClInclude Exclude="@(ClInclude)" Include="precomp.h" />
@@ -209,6 +210,7 @@
     <ClCompile Include="adapter.cpp" />
     <ClCompile Include="device.cpp" />
     <ClCompile Include="driver.cpp" />
+    <ClCompile Include="interrupt.cpp" />
     <ClCompile Include="pciconfig.cpp" />
     <ClCompile Include="power.cpp" />
     <ClCompile Include="rtlhw.cpp" />

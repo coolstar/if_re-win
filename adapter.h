@@ -3,6 +3,10 @@
 #include "if_re_bsd.h"
 #include "bsdexport.h"
 
+#define RT_MAX_TX_QUEUES (2)
+#define RT_MAX_RX_QUEUES (4)
+#define RT_MAX_QUEUES RT_MAX_RX_QUEUES
+
 typedef struct _RT_ADAPTER
 {
     // WDF handles associated with this context
@@ -19,13 +23,16 @@ typedef struct _RT_ADAPTER
     SIZE_T MMIOSize;
     BUS_INTERFACE_STANDARD PciConfig;
 
-    struct re_softc bsdData;
+    // Pointer to interrupt object
+    RT_INTERRUPT* Interrupt;
 
     NET_ADAPTER_LINK_LAYER_ADDRESS PermanentAddress;
     NET_ADAPTER_LINK_LAYER_ADDRESS CurrentAddress;
 
     BOOLEAN isRTL8125;
     ULONG64 MaxSpeed;
+
+    struct re_softc bsdData;
 } RT_ADAPTER, * PRT_ADAPTER;
 
 WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(RT_ADAPTER, RtGetAdapterContext);
