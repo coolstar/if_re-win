@@ -284,7 +284,7 @@ static void re_wait_phy_ups_resume(struct re_softc* sc, u_int16_t PhyState)
     };
 }
 
-static void re_phy_power_up(struct re_softc* sc)
+void re_phy_power_up(struct re_softc* sc)
 {
     u_int8_t Data8;
 
@@ -24305,7 +24305,7 @@ static void re_set_hw_phy_before_init_phy_mcu(struct re_softc* sc)
     }
 }
 
-static void re_hw_phy_config(struct re_softc* sc)
+void re_hw_phy_config(struct re_softc* sc)
 {
     u_int16_t Data, PhyRegValue, TmpUshort;
     u_int32_t Data_u32;

@@ -39,6 +39,3 @@
 // packet and header sizes
 #define RT_MAX_PACKET_SIZE (1514)
 #define RT_MAX_FRAME_SIZE  (RT_MAX_PACKET_SIZE + VLAN_HEADER_SIZE + FRAME_CRC_SIZE)
-
-// maximum link speed for send and recv in bps
-#define RT_MEDIA_MAX_SPEED 2'500'000'000

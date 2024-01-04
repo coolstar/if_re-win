@@ -8,3 +8,5 @@ void re_exit_oob(struct re_softc* sc);
 void re_hw_init(struct re_softc* sc);
 void re_reset(struct re_softc* sc);
 void re_get_hw_mac_address(struct re_softc* sc, u_int8_t* eaddr);
+void re_phy_power_up(struct re_softc* sc);
+void re_hw_phy_config(struct re_softc* sc);

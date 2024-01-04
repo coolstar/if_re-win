@@ -101,19 +101,14 @@ RtAdapterStart(
 
     {
         //barebones init 
-        ULONG64 maxXmitLinkSpeed = RT_MEDIA_MAX_SPEED;
-        ULONG64 maxRcvLinkSpeed = RT_MEDIA_MAX_SPEED;
-
         NET_ADAPTER_LINK_LAYER_CAPABILITIES linkLayerCapabilities;
         NET_ADAPTER_LINK_LAYER_CAPABILITIES_INIT(
             &linkLayerCapabilities,
-            maxXmitLinkSpeed,
-            maxRcvLinkSpeed);
+            adapter->MaxSpeed,
+            adapter->MaxSpeed);
 
         NetAdapterSetLinkLayerCapabilities(adapter->NetAdapter, &linkLayerCapabilities);
         NetAdapterSetLinkLayerMtuSize(adapter->NetAdapter, adapter->bsdData.mtu);
-
-        NetAdapterSetPermanentLinkLayerAddress(adapter->NetAdapter, &adapter->PermanentAddress);
         NetAdapterSetCurrentLinkLayerAddress(adapter->NetAdapter, &adapter->CurrentAddress);
     }
 

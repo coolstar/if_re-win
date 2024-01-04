@@ -166,6 +166,44 @@ RtInitializeHardware(
 
     RtlCopyMemory(&adapter->CurrentAddress, &adapter->PermanentAddress, sizeof(adapter->PermanentAddress));
 
+    re_phy_power_up(sc);
+    re_hw_phy_config(sc);
+
+    switch (adapter->bsdData.re_device_id) {
+    case RT_DEVICEID_8126:
+        adapter->MaxSpeed = 50000000000;
+        break;
+    case RT_DEVICEID_8125:
+    case RT_DEVICEID_3000:
+        adapter->MaxSpeed = 25000000000;
+        break;
+    case RT_DEVICEID_8169:
+    case RT_DEVICEID_8169SC:
+    case RT_DEVICEID_8168:
+    case RT_DEVICEID_8161:
+    case RT_DEVICEID_8162:
+        adapter->MaxSpeed = 1000000000;
+        break;
+    default:
+        adapter->MaxSpeed = 100000000;
+        break;
+    }
+
+    switch (sc->re_type) {
+    case MACFG_80:
+    case MACFG_81:
+    case MACFG_82:
+    case MACFG_83:
+    case MACFG_90:
+    case MACFG_91:
+    case MACFG_92:
+        adapter->isRTL8125 = TRUE;
+        break;
+    default:
+        adapter->isRTL8125 = FALSE;
+        break;
+    }
+
     {
         //Temp for barebones init
 
