@@ -193,8 +193,10 @@
     <ClInclude Include="adapter.h" />
     <ClInclude Include="bsd.h" />
     <ClInclude Include="device.h" />
+    <ClInclude Include="ethernet.h" />
     <ClInclude Include="forward.h" />
     <ClInclude Include="if_re_bsd.h" />
+    <ClInclude Include="mii.h" />
     <ClInclude Include="power.h" />
     <ClInclude Exclude="@(ClInclude)" Include="precomp.h" />
     <ClInclude Include="common.h" />

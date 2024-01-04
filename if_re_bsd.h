@@ -822,15 +822,17 @@ enum {
 };
 
 struct re_softc {
-    struct _RT_ADAPTER* Adapter;
+    struct _RT_ADAPTER* dev;
 
     /* Variable for 8169 family */
     u_int8_t		re_8169_MacVersion;
     u_int8_t		re_8169_PhyVersion;
 
+    u_int8_t		re_type;
     u_int16_t		re_device_id;
     int			 max_jumbo_frame_size;
     int			 re_rx_mbuf_sz;
+    int			 re_if_flags;
 
     u_int8_t RequireAdcBiasPatch;
     u_int16_t AdcBiasPatchIoffset;
@@ -853,8 +855,6 @@ struct re_softc {
 
     u_int16_t phy_reg_anlpar;
 
-    u_int8_t	link_state;
-
     u_int8_t	prohibit_access_reg;
 
     u_int8_t	re_hw_supp_now_is_oob_ver;
@@ -873,6 +873,10 @@ struct re_softc {
 
     u_int8_t HwSuppMacMcuVer;
     u_int16_t MacMcuPageSize;
+
+    //Our Additions
+    u_int16_t mtu;
+    u_int8_t eee_enable;
 };
 
 enum bits {
@@ -909,31 +913,6 @@ enum bits {
     BIT_30 = (1 << 30),
     BIT_31 = (1 << 31)
 };
-
-#define RE_LOCK(_sc)		mtx_lock(&(_sc)->mtx)
-#define RE_UNLOCK(_sc)		mtx_unlock(&(_sc)->mtx)
-#define RE_LOCK_INIT(_sc,_name)	mtx_init(&(_sc)->mtx,_name,MTX_NETWORK_LOCK,MTX_DEF)
-#define RE_LOCK_DESTROY(_sc)	mtx_destroy(&(_sc)->mtx)
-#define RE_LOCK_ASSERT(_sc)	mtx_assert(&(_sc)->mtx,MA_OWNED)
-
-/*
- * register space access macros
- */
-#define CSR_WRITE_4(sc, reg, val)	((sc->prohibit_access_reg)?:bus_space_write_4(sc->re_btag, sc->re_bhandle, reg, val))
-#define CSR_WRITE_2(sc, reg, val)	((sc->prohibit_access_reg)?:bus_space_write_2(sc->re_btag, sc->re_bhandle, reg, val))
-#define CSR_WRITE_1(sc, reg, val)	((sc->prohibit_access_reg)?:bus_space_write_1(sc->re_btag, sc->re_bhandle, reg, val))
-
-#define CSR_READ_4(sc, reg)	((sc->prohibit_access_reg)?0xFFFFFFFF:bus_space_read_4(sc->re_btag, sc->re_bhandle, reg))
-#define CSR_READ_2(sc, reg)	((sc->prohibit_access_reg)?0xFFFF:bus_space_read_2(sc->re_btag, sc->re_bhandle, reg))
-#define CSR_READ_1(sc, reg)	((sc->prohibit_access_reg)?0xFF:bus_space_read_1(sc->re_btag, sc->re_bhandle, reg))
-
- /* cmac write/read MMIO register */
-#define RE_CMAC_WRITE_1(sc, reg, val) ((sc->prohibit_access_reg)?:bus_space_write_1(sc->re_cmac_tag, sc->re_cmac_handle, reg, val))
-#define RE_CMAC_WRITE_2(sc, reg, val) ((sc->prohibit_access_reg)?:bus_space_write_2(sc->re_cmac_tag, sc->re_cmac_handle, reg, val))
-#define RE_CMAC_WRITE_4(sc, reg, val) ((sc->prohibit_access_reg)?:bus_space_write_4(sc->re_cmac_tag, sc->re_cmac_handle, reg, val))
-#define RE_CMAC_READ_1(sc, reg) ((sc->prohibit_access_reg)?0xFF:bus_space_read_1(sc->re_cmac_tag, sc->re_cmac_handle, reg))
-#define RE_CMAC_READ_2(sc, reg) ((sc->prohibit_access_reg)?0xFFFF:bus_space_read_2(sc->re_cmac_tag, sc->re_cmac_handle, reg))
-#define RE_CMAC_READ_4(sc, reg) (sc->prohibit_access_reg)?0xFFFFFFFF:bus_space_read_4(sc->re_cmac_tag, sc->re_cmac_handle, reg))
 
 #define RE_TIMEOUT		1000
 

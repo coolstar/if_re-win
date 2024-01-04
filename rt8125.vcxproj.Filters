@@ -17,6 +17,12 @@
       <Extensions>inf;inv;inx;mof;mc;</Extensions>
       <UniqueIdentifier>{FD9F921C-D1EF-421B-A692-F23423B32E64}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\BSD">
+      <UniqueIdentifier>{6e28619c-acdf-4fd4-b4b4-2ffcb2d448ed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\BSD">
+      <UniqueIdentifier>{88ff9f33-c59c-4c16-89a5-751652249ab0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Inf Include="rt8125.inx">
@@ -51,7 +57,7 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="rtlhw.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\BSD</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -82,11 +88,17 @@
     <ClInclude Include="txqueue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="if_re_bsd.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="bsd.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\BSD</Filter>
+    </ClInclude>
+    <ClInclude Include="if_re_bsd.h">
+      <Filter>Header Files\BSD</Filter>
+    </ClInclude>
+    <ClInclude Include="mii.h">
+      <Filter>Header Files\BSD</Filter>
+    </ClInclude>
+    <ClInclude Include="ethernet.h">
+      <Filter>Header Files\BSD</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
