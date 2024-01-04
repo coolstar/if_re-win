@@ -53,10 +53,9 @@
 #define RE_TXADDR2	0x0028		/* address of TX descriptor 2 */
 #define RE_TXADDR3	0x002C		/* address of TX descriptor 3 */
 
-#define RE_RXADDR	0x0030		/* RX ring start address */
+#define RE_FLASH	0x0030
 #define RE_COMMAND	0x0037		/* command register */
-#define RE_CURRXADDR	0x0038		/* current address of packet read */
-#define RE_CURRXBUF	0x003A		/* current RX buffer address */
+#define RE_TXPOLL	0x0038		/* current address of packet read */
 #define RE_IMR		0x003C		/* interrupt mask register */
 #define RE_ISR		0x003E		/* interrupt status register */
 #define RE_TXCFG	0x0040		/* transmit config */
@@ -103,6 +102,8 @@
 #define RE_EFUSEAR	0x00DC
 #define RE_CPlusCmd	0x00E0
 #define RE_IntrMitigate	0x00E2
+#define RE_RXADDR0	0x00E4		/* address of RX descriptor 0 */
+#define RE_RXADDR1	0x00E8		/* address of RX descriptor 1 */
 #define	RE_MTPS		0x00EC
 #define	RE_CMAC_IBCR0     	0x00F8
 #define	RE_CMAC_IBCR2     	0x00F9
