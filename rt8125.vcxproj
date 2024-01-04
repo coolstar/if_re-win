@@ -192,6 +192,7 @@
   <ItemGroup>
     <ClInclude Include="adapter.h" />
     <ClInclude Include="bsd.h" />
+    <ClInclude Include="bsdexport.h" />
     <ClInclude Include="device.h" />
     <ClInclude Include="ethernet.h" />
     <ClInclude Include="forward.h" />
@@ -208,6 +209,7 @@
     <ClCompile Include="adapter.cpp" />
     <ClCompile Include="device.cpp" />
     <ClCompile Include="driver.cpp" />
+    <ClCompile Include="pciconfig.cpp" />
     <ClCompile Include="power.cpp" />
     <ClCompile Include="rtlhw.cpp" />
     <ClCompile Include="rxqueue.cpp" />

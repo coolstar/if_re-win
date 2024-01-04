@@ -132,6 +132,29 @@ RtInitializeHardware(
         RtRegisterScatterGatherDma(adapter),
         TraceLoggingRtAdapter(adapter));
 
+    GOTO_IF_NOT_NT_SUCCESS(Exit, status,
+        BSD_NT_WRAP(re_check_mac_version(&adapter->bsdData)),
+        TraceLoggingRtAdapter(adapter));
+
+    re_init_software_variable(&adapter->bsdData);
+    re_exit_oob(&adapter->bsdData);
+    re_hw_init(&adapter->bsdData);
+
+    /*
+    * Reset the adapter. Don't need to lock during init
+    */
+
+    re_reset(&adapter->bsdData);
+
+    if (adapter->bsdData.re_type == MACFG_3) { /* Change PCI Latency time */
+        ConfigWrite8(adapter, RE_PCI_LATENCY_TIMER, 0x40);
+    }
+
+    re_get_hw_mac_address(&adapter->bsdData, adapter->PermanentAddress.Address);
+    adapter->PermanentAddress.Length = ETHERNET_LENGTH_OF_ADDRESS;
+
+    RtlCopyMemory(&adapter->CurrentAddress, &adapter->PermanentAddress, sizeof(adapter->PermanentAddress));
+
     {
         //Temp for barebones init
 
@@ -165,9 +188,18 @@ EvtDevicePrepareHardware(
 
     TraceEntryRtAdapter(adapter);
 
+    RtlZeroMemory(&adapter->bsdData, sizeof(adapter->bsdData));
+
     adapter->bsdData.dev = adapter;
     adapter->bsdData.mtu = ETHERMTU;
     adapter->bsdData.eee_enable = 0;
+
+    adapter->PciConfig.GetBusData(
+        adapter->PciConfig.Context,
+        PCI_WHICHSPACE_CONFIG,
+        &adapter->bsdData.re_device_id,
+        2,
+        sizeof(adapter->bsdData.re_device_id));
 
     NTSTATUS status = STATUS_SUCCESS;
     GOTO_IF_NOT_NT_SUCCESS(Exit, status, RtInitializeHardware(adapter, resourcesRaw, resourcesTranslated));

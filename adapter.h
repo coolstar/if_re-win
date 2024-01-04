@@ -1,6 +1,7 @@
 #pragma once
 
 #include "if_re_bsd.h"
+#include "bsdexport.h"
 
 typedef struct _RT_ADAPTER
 {
@@ -38,3 +39,8 @@ RtInitializeAdapterContext(
 NTSTATUS
 RtAdapterStart(
     _In_ RT_ADAPTER* adapter);
+
+UINT8 ConfigRead8(_In_ RT_ADAPTER* adapter, UINT32 reg);
+UINT16 ConfigRead16(_In_ RT_ADAPTER* adapter, UINT32 reg);
+void ConfigWrite8(_In_ RT_ADAPTER* adapter, UINT32 reg, UINT8 val);
+void ConfigWrite16(_In_ RT_ADAPTER* adapter, UINT32 reg, UINT16 val);

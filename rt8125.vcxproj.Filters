@@ -59,6 +59,9 @@
     <ClCompile Include="rtlhw.cpp">
       <Filter>Source Files\BSD</Filter>
     </ClCompile>
+    <ClCompile Include="pciconfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="adapter.h">
@@ -98,6 +101,9 @@
       <Filter>Header Files\BSD</Filter>
     </ClInclude>
     <ClInclude Include="ethernet.h">
+      <Filter>Header Files\BSD</Filter>
+    </ClInclude>
+    <ClInclude Include="bsdexport.h">
       <Filter>Header Files\BSD</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1777,7 +1777,7 @@ re_disable_magic_packet(struct re_softc* sc)
         CSR_WRITE_1(sc, RE_CFG3, CSR_READ_1(sc, RE_CFG3) & ~RL_CFG3_WOL_MAGIC);
 }
 
-static void re_exit_oob(struct re_softc* sc)
+void re_exit_oob(struct re_softc* sc)
 {
     u_int16_t data16;
     int i;
@@ -2032,7 +2032,7 @@ static void re_exit_oob(struct re_softc* sc)
     re_hw_mac_mcu_config(sc);
 }
 
-static void re_hw_init(struct re_softc* sc)
+void re_hw_init(struct re_softc* sc)
 {
     /*
     * disable EDT.
@@ -2183,7 +2183,7 @@ static void re_rar_set(struct re_softc* sc, u_int8_t* eaddr)
     re_disable_cfg9346_write(sc);
 }
 
-static void re_get_hw_mac_address(struct re_softc* sc, u_int8_t* eaddr)
+void re_get_hw_mac_address(struct re_softc* sc, u_int8_t* eaddr)
 {
     u_int16_t re_eeid = 0;
     int i;
@@ -2248,7 +2248,7 @@ static void re_get_hw_mac_address(struct re_softc* sc, u_int8_t* eaddr)
     re_rar_set(sc, eaddr);
 }
 
-static int re_check_mac_version(struct re_softc* sc)
+int re_check_mac_version(struct re_softc* sc)
 {
     int error = 0;
 
@@ -2688,7 +2688,7 @@ static int re_check_mac_version(struct re_softc* sc)
     return error;
 }
 
-static void re_init_software_variable(struct re_softc* sc)
+void re_init_software_variable(struct re_softc* sc)
 {
     switch (sc->re_device_id) {
     case RT_DEVICEID_8168:
@@ -5335,7 +5335,7 @@ static void re_hw_start_unlock_8125(struct re_softc* sc)
     CSR_WRITE_4(sc, RE_IMR0_8125, RE_INTRS);
 }
 
-static void re_reset(struct re_softc* sc)
+void re_reset(struct re_softc* sc)
 {
     register int		i;
 
