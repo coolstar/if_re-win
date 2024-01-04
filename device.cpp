@@ -36,8 +36,6 @@ RtGetResources(
             // RTL8125 has 2 memory IO regions, first region is MAC regs, second region is MSI-X
             if (memRegCnt == 0)
             {
-                NT_ASSERT(rawDescriptor->u.Memory.Length >= sizeof(RT_MAC));
-
                 adapter->MMIOAddress = MmMapIoSpaceEx(
                     translatedDescriptor->u.Memory.Start,
                     translatedDescriptor->u.Memory.Length,
@@ -59,7 +57,7 @@ RtGetResources(
         GOTO_IF_NOT_NT_SUCCESS(Exit, status, STATUS_NDIS_RESOURCE_CONFLICT);
     }
 
-    WdfFdoQueryForInterface(adapter->WdfDevice,
+    status = WdfFdoQueryForInterface(adapter->WdfDevice,
         &GUID_BUS_INTERFACE_STANDARD,
         (PINTERFACE)&adapter->PciConfig,
         sizeof(BUS_INTERFACE_STANDARD),
@@ -125,12 +123,25 @@ RtInitializeHardware(
     //
     NTSTATUS status = STATUS_SUCCESS;
 
+    re_softc* sc = &adapter->bsdData;
+
     GOTO_IF_NOT_NT_SUCCESS(Exit, status,
         RtGetResources(adapter, resourcesRaw, resourcesTranslated));
 
     GOTO_IF_NOT_NT_SUCCESS(Exit, status,
         RtRegisterScatterGatherDma(adapter),
         TraceLoggingRtAdapter(adapter));
+
+    RtlZeroMemory(&adapter->bsdData, sizeof(adapter->bsdData));
+
+    adapter->bsdData.dev = adapter;
+    adapter->bsdData.mtu = ETHERMTU;
+    adapter->bsdData.eee_enable = 0;
+
+    UINT16 devID = ConfigRead16(adapter, 2);
+    adapter->bsdData.re_device_id = devID;
+
+    DbgPrint("Device ID: 0x%x\n", devID);
 
     GOTO_IF_NOT_NT_SUCCESS(Exit, status,
         BSD_NT_WRAP(re_check_mac_version(&adapter->bsdData)),
@@ -187,19 +198,6 @@ EvtDevicePrepareHardware(
     RT_ADAPTER* adapter = RtGetDeviceContext(device)->Adapter;
 
     TraceEntryRtAdapter(adapter);
-
-    RtlZeroMemory(&adapter->bsdData, sizeof(adapter->bsdData));
-
-    adapter->bsdData.dev = adapter;
-    adapter->bsdData.mtu = ETHERMTU;
-    adapter->bsdData.eee_enable = 0;
-
-    adapter->PciConfig.GetBusData(
-        adapter->PciConfig.Context,
-        PCI_WHICHSPACE_CONFIG,
-        &adapter->bsdData.re_device_id,
-        2,
-        sizeof(adapter->bsdData.re_device_id));
 
     NTSTATUS status = STATUS_SUCCESS;
     GOTO_IF_NOT_NT_SUCCESS(Exit, status, RtInitializeHardware(adapter, resourcesRaw, resourcesTranslated));

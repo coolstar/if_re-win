@@ -45,10 +45,10 @@
 
 #define MmioAddr(sc, Reg) Add2Ptr(sc->dev->MMIOAddress, Reg)
 
-#if DEBUG
+#if 1
 #define device_printf(dev, x, ...) DbgPrint(x, __VA_ARGS__)
 #else
-#define device_printf(dev, x, ...)
+#define device_printf(dev, x, ...) __nop()
 #endif
 
 #define DBGPRINT1(dev, x, ...) DbgPrint(x, __VA_ARGS__)
@@ -83,7 +83,7 @@
 #include "mii.h"
 #include "ethernet.h"
 
-NTSYSAPI ULONG RtlRandomEx(
+NTSYSAPI extern "C" ULONG RtlRandomEx(
     _Inout_ PULONG Seed
 );
 
