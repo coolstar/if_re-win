@@ -107,7 +107,7 @@ done:
 	return true;
 }
 
-/*static
+static
 void
 RtRxNotify(
 	_In_ RT_INTERRUPT* interrupt,
@@ -119,7 +119,7 @@ RtRxNotify(
 		NetRxQueueNotifyMoreReceivedPacketsAvailable(
 			interrupt->Adapter->RxQueues[queueId]);
 	}
-}*/
+}
 
 _Use_decl_annotations_
 VOID
@@ -142,9 +142,9 @@ EvtInterruptDpc(
 		}
 	}
 
-	/*if (InterlockedExchange8(&interrupt->rxInterrupt, FALSE)) {
+	if (InterlockedExchange8(&interrupt->rxInterrupt, FALSE)) {
 		RtRxNotify(interrupt, 0);
-	}*/
+	}
 
 	if (InterlockedExchange8(&interrupt->linkChg, FALSE)) {
 		DbgPrint("Link Changed\n");
