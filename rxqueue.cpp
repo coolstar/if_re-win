@@ -175,7 +175,6 @@ RxPostBuffers(
     }
 }
 
-
 NTSTATUS
 RtRxQueueInitialize(
     _In_ NETPACKETQUEUE rxQueue,
@@ -254,8 +253,6 @@ EvtRxQueueStart(
     adapter->RxQueues[rx->QueueId] = rxQueue;
 
     //RtAdapterUpdateRcr(adapter);
-
-    //RtlEnableHw(adapter);
 
     WdfSpinLockRelease(adapter->Lock);
 }

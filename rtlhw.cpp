@@ -56,6 +56,8 @@ static void re_clrwol			__P((struct re_softc*));
 static void re_set_wol_linkspeed 	__P((struct re_softc*));
 #endif
 
+static void re_set_rx_packet_filter	__P((struct re_softc*));
+
 static void re_eeprom_ShiftOutBits		__P((struct re_softc*, int, int));
 static u_int16_t re_eeprom_ShiftInBits		__P((struct re_softc*));
 static void re_eeprom_EEpromCleanup		__P((struct re_softc*));
@@ -5664,6 +5666,34 @@ void re_stop(struct re_softc* sc) {
     }
 
     re_reset(sc);
+}
+
+static void re_set_rx_packet_filter(struct re_softc* sc) {
+    u_int32_t rxfilt;
+
+    rxfilt = CSR_READ_4(sc, RE_RXCFG);
+
+    rxfilt |= RE_RXCFG_RX_INDIV;
+
+    rxfilt |= (RE_RXCFG_RX_ALLPHYS | RE_RXCFG_RX_MULTI);
+    rxfilt |= RE_RXCFG_RX_BROAD;
+
+    CSR_WRITE_4(sc, RE_RXCFG, rxfilt);
+
+    u_int32_t mask0 = 0xffffffff;
+    u_int32_t mask4 = 0xffffffff;
+
+    u_int8_t  enable_cfg_reg_write = 0;
+
+    if (sc->re_type == MACFG_5 || sc->re_type == MACFG_6)
+        enable_cfg_reg_write = 1;
+
+    if (enable_cfg_reg_write)
+        re_enable_cfg9346_write(sc);
+    CSR_WRITE_4(sc, RE_MAR0, mask0);
+    CSR_WRITE_4(sc, RE_MAR4, mask4);
+    if (enable_cfg_reg_write)
+        re_disable_cfg9346_write(sc);
 }
 
 /*

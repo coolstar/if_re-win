@@ -11,9 +11,6 @@
 #define phy_mdix_mode RE_ETH_PHY_AUTO_MDI_MDIX
 #define max_rx_mbuf_sz  MJUM9BYTES
 
-//TODO
-#define re_set_rx_packet_filter(x) __nop()
-
 // BSD Compat
 
 #define	MJUM9BYTES	(9 * 1024)	/* jumbo cluster 9k */
