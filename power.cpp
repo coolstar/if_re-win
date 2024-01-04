@@ -21,6 +21,24 @@ EvtDeviceD0Entry(
     {
         // We're coming back from low power, undo what
         // we did in EvtDeviceD0Exit
+
+        re_softc* sc = &adapter->bsdData;
+        sc->prohibit_access_reg = 0;
+
+        re_exit_oob(sc);
+        re_hw_init(sc);
+        re_reset(sc);
+        re_phy_power_up(sc);
+        re_hw_phy_config(sc);
+
+        if (adapter->isRTL8125) {
+            re_hw_start_unlock_8125(sc);
+            re_ifmedia_upd_8125(sc);
+        }
+        else {
+            re_hw_start_unlock(sc);
+            re_ifmedia_upd(sc);
+        }
     }
 
     TraceExitResult(STATUS_SUCCESS);
@@ -40,6 +58,11 @@ EvtDeviceD0Exit(
 
     if (TargetState != WdfPowerDeviceD3Final)
     {
+        re_softc* sc = &adapter->bsdData;
+        re_stop(sc);
+        re_hw_d3_para(sc);
+        sc->prohibit_access_reg = 1;
+
         NET_ADAPTER_LINK_STATE linkState;
         NET_ADAPTER_LINK_STATE_INIT(
             &linkState,

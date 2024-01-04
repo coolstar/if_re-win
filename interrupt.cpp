@@ -2,6 +2,7 @@
 #include "trace.h"
 #include "adapter.h"
 #include "interrupt.h"
+#include "link.h"
 
 NTSTATUS
 RtInterruptCreate(
@@ -147,6 +148,6 @@ EvtInterruptDpc(
 
 	if (InterlockedExchange8(&interrupt->linkChg, FALSE)) {
 		DbgPrint("Link Changed\n");
-		//RtlCheckLinkStatus(adapter);
+		RtlCheckLinkStatus(adapter);
 	}
 }

@@ -13,3 +13,12 @@ void re_hw_phy_config(struct re_softc* sc);
 
 void re_hw_start_unlock(struct re_softc* sc);
 void re_hw_start_unlock_8125(struct re_softc* sc);
+u_int8_t re_link_ok(struct re_softc* sc);
+
+void re_link_on_patch(struct re_softc* sc);
+void re_stop(struct re_softc* sc);
+
+void re_hw_d3_para(struct re_softc* sc);
+
+int re_ifmedia_upd(struct re_softc* sc);
+int re_ifmedia_upd_8125(struct re_softc* sc);

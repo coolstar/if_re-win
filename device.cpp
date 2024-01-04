@@ -145,6 +145,10 @@ RtInitializeHardware(
 
     re_init_software_variable(&adapter->bsdData);
 
+    adapter->reqSpeed = SPEED_AUTO;
+    adapter->reqFullDuplex = FullDuplex;
+    adapter->reqFlowControl = FlowControl;
+
     GOTO_IF_NOT_NT_SUCCESS(Exit, status,
         RtRegisterScatterGatherDma(adapter),
         TraceLoggingRtAdapter(adapter));
@@ -224,9 +228,11 @@ RtInitializeHardware(
 
     if (adapter->isRTL8125) {
         re_hw_start_unlock_8125(sc);
+        re_ifmedia_upd_8125(sc);
     }
     else {
         re_hw_start_unlock(sc);
+        re_ifmedia_upd(sc);
     }
 
 Exit:

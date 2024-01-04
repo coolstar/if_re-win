@@ -7,6 +7,25 @@
 #define RT_MAX_RX_QUEUES (4)
 #define RT_MAX_QUEUES RT_MAX_RX_QUEUES
 
+typedef enum REQ_SPEED {
+    SPEED_AUTO,
+    SPEED_5000,
+    SPEED_2500,
+    SPEED_1000,
+    SPEED_100,
+    SPEED_10
+};
+
+typedef enum DUPL_MODE {
+    FullDuplex,
+    HalfDuplex
+};
+
+typedef enum FLOW_CTRL {
+    FlowControl,
+    NoFlowControl
+};
+
 typedef struct _RT_ADAPTER
 {
     // WDF handles associated with this context
@@ -31,6 +50,10 @@ typedef struct _RT_ADAPTER
 
     BOOLEAN isRTL8125;
     ULONG64 MaxSpeed;
+
+    REQ_SPEED reqSpeed;
+    DUPL_MODE reqFullDuplex;
+    FLOW_CTRL reqFlowControl;
 
     struct re_softc bsdData;
 } RT_ADAPTER, * PRT_ADAPTER;

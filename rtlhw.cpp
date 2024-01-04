@@ -3294,7 +3294,7 @@ static void re_disable_ocp_phy_power_saving(struct re_softc* sc)
     }
 }
 
-static void re_hw_d3_para(struct re_softc* sc)
+void re_hw_d3_para(struct re_softc* sc)
 {
     switch (sc->re_type) {
     case MACFG_59:
@@ -5435,7 +5435,7 @@ void re_reset(struct re_softc* sc)
     return;
 }
 
-static u_int8_t re_link_ok(struct re_softc* sc)
+u_int8_t re_link_ok(struct re_softc* sc)
 {
     u_int8_t	retval;
 
@@ -5512,6 +5512,327 @@ re_set_wol_linkspeed(struct re_softc* sc)
         break;
     }
 }
+
+void re_link_on_patch(struct re_softc* sc)
+{
+    if (sc->re_type == MACFG_50 || sc->re_type == MACFG_51 || sc->re_type == MACFG_52) {
+        if (CSR_READ_1(sc, RE_PHY_STATUS) & RL_PHY_STATUS_1000MF) {
+            re_eri_write(sc, 0x1bc, 4, 0x00000011, ERIAR_ExGMAC);
+            re_eri_write(sc, 0x1dc, 4, 0x0000001f, ERIAR_ExGMAC);
+        }
+        else if (CSR_READ_1(sc, RE_PHY_STATUS) & RL_PHY_STATUS_100M) {
+            re_eri_write(sc, 0x1bc, 4, 0x0000001f, ERIAR_ExGMAC);
+            re_eri_write(sc, 0x1dc, 4, 0x0000001f, ERIAR_ExGMAC);
+        }
+        else {
+            re_eri_write(sc, 0x1bc, 4, 0x0000001f, ERIAR_ExGMAC);
+            re_eri_write(sc, 0x1dc, 4, 0x0000002d, ERIAR_ExGMAC);
+        }
+    }
+    else if ((sc->re_type == MACFG_38 || sc->re_type == MACFG_39)/* && (ifp->if_flags & IFF_UP)*/) {
+        if (sc->re_type == MACFG_38 && (CSR_READ_1(sc, RE_PHY_STATUS) & RL_PHY_STATUS_10M)) {
+            CSR_WRITE_4(sc, RE_RXCFG, CSR_READ_4(sc, RE_RXCFG) | RE_RXCFG_RX_ALLPHYS);
+        }
+        else if (sc->re_type == MACFG_39) {
+            if (CSR_READ_1(sc, RE_PHY_STATUS) & RL_PHY_STATUS_1000MF) {
+                re_eri_write(sc, 0x1bc, 4, 0x00000011, ERIAR_ExGMAC);
+                re_eri_write(sc, 0x1dc, 4, 0x00000005, ERIAR_ExGMAC);
+            }
+            else if (CSR_READ_1(sc, RE_PHY_STATUS) & RL_PHY_STATUS_100M) {
+                re_eri_write(sc, 0x1bc, 4, 0x0000001f, ERIAR_ExGMAC);
+                re_eri_write(sc, 0x1dc, 4, 0x00000005, ERIAR_ExGMAC);
+            }
+            else {
+                re_eri_write(sc, 0x1bc, 4, 0x0000001f, ERIAR_ExGMAC);
+                re_eri_write(sc, 0x1dc, 4, 0x0000003f, ERIAR_ExGMAC);
+            }
+        }
+    }
+    else if ((sc->re_type == MACFG_36 || sc->re_type == MACFG_37) && sc->eee_enable == 1) {
+        /*Full -Duplex  mode*/
+        if (CSR_READ_1(sc, RE_PHY_STATUS) & RL_PHY_STATUS_FULL_DUP) {
+            MP_WritePhyUshort(sc, 0x1F, 0x0006);
+            MP_WritePhyUshort(sc, 0x00, 0x5a30);
+            MP_WritePhyUshort(sc, 0x1F, 0x0000);
+            if (CSR_READ_1(sc, RE_PHY_STATUS) & (RL_PHY_STATUS_10M | RL_PHY_STATUS_100M))
+                CSR_WRITE_4(sc, RE_TXCFG, (CSR_READ_4(sc, RE_TXCFG) & ~BIT_19) | BIT_25);
+
+        }
+        else {
+            MP_WritePhyUshort(sc, 0x1F, 0x0006);
+            MP_WritePhyUshort(sc, 0x00, 0x5a00);
+            MP_WritePhyUshort(sc, 0x1F, 0x0000);
+            if (CSR_READ_1(sc, RE_PHY_STATUS) & (RL_PHY_STATUS_10M | RL_PHY_STATUS_100M))
+                CSR_WRITE_4(sc, RE_TXCFG, (CSR_READ_4(sc, RE_TXCFG) & ~BIT_19) | RE_TXCFG_IFG);
+        }
+    }
+    else if ((sc->re_type == MACFG_56 || sc->re_type == MACFG_57 ||
+        sc->re_type == MACFG_58 || sc->re_type == MACFG_59 ||
+        sc->re_type == MACFG_60 || sc->re_type == MACFG_61 ||
+        sc->re_type == MACFG_62 || sc->re_type == MACFG_67 ||
+        sc->re_type == MACFG_68 || sc->re_type == MACFG_69 ||
+        sc->re_type == MACFG_70 || sc->re_type == MACFG_71 ||
+        sc->re_type == MACFG_72 || sc->re_type == MACFG_73 ||
+        sc->re_type == MACFG_74 || sc->re_type == MACFG_75 ||
+        sc->re_type == MACFG_76 || sc->re_type == MACFG_80 ||
+        sc->re_type == MACFG_81 || sc->re_type == MACFG_82 ||
+        sc->re_type == MACFG_83 || sc->re_type == MACFG_90 ||
+        sc->re_type == MACFG_91 || sc->re_type == MACFG_92)/* &&
+        (ifp->if_flags & IFF_UP)*/) {
+        if (CSR_READ_1(sc, RE_PHY_STATUS) & RL_PHY_STATUS_FULL_DUP)
+            CSR_WRITE_4(sc, RE_TXCFG, (CSR_READ_4(sc, RE_TXCFG) | (BIT_24 | BIT_25)) & ~BIT_19);
+        else
+            CSR_WRITE_4(sc, RE_TXCFG, (CSR_READ_4(sc, RE_TXCFG) | BIT_25) & ~(BIT_19 | BIT_24));
+    }
+
+    if (sc->re_type == MACFG_56 || sc->re_type == MACFG_57 ||
+        sc->re_type == MACFG_61 || sc->re_type == MACFG_62) {
+        /*half mode*/
+        if (!(CSR_READ_1(sc, RE_PHY_STATUS) & RL_PHY_STATUS_FULL_DUP)) {
+            MP_WritePhyUshort(sc, 0x1F, 0x0000);
+            MP_WritePhyUshort(sc, MII_ANAR, MP_ReadPhyUshort(sc, MII_ANAR) & ~(ANAR_FC | ANAR_PAUSE_ASYM));
+        }
+    }
+
+    if (CSR_READ_1(sc, RE_PHY_STATUS) & RL_PHY_STATUS_10M) {
+        if (sc->re_type == MACFG_70 || sc->re_type == MACFG_71 ||
+            sc->re_type == MACFG_72 || sc->re_type == MACFG_73) {
+            uint32_t Data32;
+
+            Data32 = re_eri_read(sc, 0x1D0, 1, ERIAR_ExGMAC);
+            Data32 |= BIT_1;
+            re_eri_write(sc, 0x1D0, 1, Data32, ERIAR_ExGMAC);
+        }
+        else if (sc->re_type == MACFG_80 || sc->re_type == MACFG_81 ||
+            sc->re_type == MACFG_82 || sc->re_type == MACFG_83 ||
+            sc->re_type == MACFG_90 || sc->re_type == MACFG_91 ||
+            sc->re_type == MACFG_92) {
+            MP_WriteMcuAccessRegWord(sc, 0xE080, MP_ReadMcuAccessRegWord(sc, 0xE080) | BIT_1);
+        }
+    }
+}
+
+void re_stop(struct re_softc* sc) {
+    /*
+         * Disable accepting frames to put RX MAC into idle state.
+         * Otherwise it's possible to get frames while stop command
+         * execution is in progress and controller can DMA the frame
+         * to already freed RX buffer during that period.
+         */
+    CSR_WRITE_4(sc, RE_RXCFG, CSR_READ_4(sc, RE_RXCFG) &
+        ~(RE_RXCFG_RX_ALLPHYS | RE_RXCFG_RX_INDIV | RE_RXCFG_RX_MULTI |
+            RE_RXCFG_RX_BROAD | RE_RXCFG_RX_RUNT | RE_RXCFG_RX_ERRPKT));
+
+    switch (sc->re_type) {
+    case MACFG_80:
+    case MACFG_81:
+    case MACFG_82:
+    case MACFG_83:
+    case MACFG_90:
+    case MACFG_91:
+    case MACFG_92:
+        CSR_WRITE_4(sc, RE_IMR0_8125, 0x00000000);
+        CSR_WRITE_4(sc, RE_ISR0_8125, 0xffffffff);
+        break;
+    default:
+        CSR_WRITE_2(sc, RE_IMR, 0x0000);
+        CSR_WRITE_2(sc, RE_ISR, 0xffff);
+        break;
+    }
+
+    switch (sc->re_type) {
+    case MACFG_50:
+    case MACFG_51:
+    case MACFG_52:
+        re_eri_write(sc, 0x1bc, 4, 0x0000001f, ERIAR_ExGMAC);
+        re_eri_write(sc, 0x1dc, 4, 0x0000002d, ERIAR_ExGMAC);
+        break;
+    case MACFG_38:
+        re_eri_write(sc, 0x1bc, 4, 0x0000001f, ERIAR_ExGMAC);
+        re_eri_write(sc, 0x1dc, 4, 0x0000003f, ERIAR_ExGMAC);
+        break;
+    }
+
+    switch (sc->re_type) {
+    case MACFG_74:
+    case MACFG_75:
+        SetMcuAccessRegBit(sc, 0xD438, BIT_3);
+        SetMcuAccessRegBit(sc, 0xD438, BIT_2);
+        ClearMcuAccessRegBit(sc, 0xDE28, (BIT_1 | BIT_0));
+        SetMcuAccessRegBit(sc, 0xD438, (BIT_1 | BIT_0));
+        break;
+    }
+
+    re_reset(sc);
+}
+
+/*
+ * Set media options.
+ */
+int re_ifmedia_upd(struct re_softc* sc)
+{
+    int anar;
+    int gbcr;
+
+    if (sc->re_type == MACFG_68 || sc->re_type == MACFG_69 ||
+        sc->re_type == MACFG_70 || sc->re_type == MACFG_71 ||
+        sc->re_type == MACFG_72 || sc->re_type == MACFG_73 ||
+        sc->re_type == MACFG_74 || sc->re_type == MACFG_75) {
+        //Disable Giga Lite
+        MP_WritePhyUshort(sc, 0x1F, 0x0A42);
+        ClearEthPhyBit(sc, 0x14, BIT_9);
+        if (sc->re_type == MACFG_70 || sc->re_type == MACFG_71 ||
+            sc->re_type == MACFG_72 || sc->re_type == MACFG_73)
+            ClearEthPhyBit(sc, 0x14, BIT_7);
+        MP_WritePhyUshort(sc, 0x1F, 0x0A40);
+        MP_WritePhyUshort(sc, 0x1F, 0x0000);
+    }
+
+    gbcr = MP_ReadPhyUshort(sc, MII_100T2CR) &
+        ~(GTCR_ADV_1000TFDX | GTCR_ADV_1000THDX);
+    anar = MP_ReadPhyUshort(sc, MII_ANAR) &
+        ~(ANAR_10 | ANAR_10_FD | ANAR_TX | ANAR_TX_FD | ANAR_FC | ANAR_PAUSE_ASYM);
+
+    switch (sc->dev->reqSpeed) {
+    case SPEED_AUTO:
+        anar = (ANAR_10 | ANAR_10_FD | ANAR_TX | ANAR_TX_FD);
+        gbcr |= (GTCR_ADV_1000TFDX | GTCR_ADV_1000THDX);
+        break;
+
+    case SPEED_1000:
+        if (sc->dev->reqFullDuplex == FullDuplex)
+            gbcr |= GTCR_ADV_1000TFDX;
+        else
+            gbcr |= GTCR_ADV_1000THDX;
+        break;
+    case SPEED_100:
+        if (sc->dev->reqFullDuplex == FullDuplex)
+            anar |= ANAR_TX_FD;
+        else
+            anar |= ANAR_TX;
+        break;
+        /*	FALLTHROUGH */
+    case SPEED_10:
+        if (sc->dev->reqFullDuplex == FullDuplex)
+            anar |= ANAR_10_FD;
+        else
+            anar |= ANAR_10;
+
+        if (sc->re_type == MACFG_13) {
+            MP_WritePhyUshort(sc, MII_BMCR, 0x8000);
+        }
+
+        break;
+    default:
+        DBGPRINT1(sc, "Unsupported media type\n");
+        return(0);
+    }
+
+    if (sc->re_device_id == RT_DEVICEID_8162)
+        ClearEthPhyOcpBit(sc, 0xA5D4, RTK_ADVERTISE_2500FULL);
+
+    MP_WritePhyUshort(sc, 0x1F, 0x0000);
+    if (sc->re_device_id == RT_DEVICEID_8169 || sc->re_device_id == RT_DEVICEID_8169SC ||
+        sc->re_device_id == RT_DEVICEID_8168 || sc->re_device_id == RT_DEVICEID_8161 ||
+        sc->re_device_id == RT_DEVICEID_8162) {
+        if (sc->dev->reqFlowControl == FlowControl)
+            anar |= (ANAR_FC | ANAR_PAUSE_ASYM);
+
+        MP_WritePhyUshort(sc, MII_ANAR, anar);
+        MP_WritePhyUshort(sc, MII_100T2CR, gbcr);
+        MP_WritePhyUshort(sc, MII_BMCR, BMCR_RESET | BMCR_AUTOEN | BMCR_STARTNEG);
+    }
+    else if (sc->re_type == MACFG_36) {
+        if (sc->dev->reqFlowControl == FlowControl)
+            anar |= (ANAR_FC | ANAR_PAUSE_ASYM);
+
+        MP_WritePhyUshort(sc, MII_ANAR, anar);
+        MP_WritePhyUshort(sc, MII_BMCR, BMCR_RESET | BMCR_AUTOEN | BMCR_STARTNEG);
+    }
+    else {
+        MP_WritePhyUshort(sc, MII_ANAR, anar | 1);
+        MP_WritePhyUshort(sc, MII_BMCR, BMCR_AUTOEN | BMCR_STARTNEG);
+    }
+
+    return(0);
+}
+
+int re_ifmedia_upd_8125(struct re_softc* sc)
+{
+    int anar;
+    int gbcr;
+    int cr2500;
+
+    //Disable Giga Lite
+    ClearEthPhyOcpBit(sc, 0xA428, BIT_9);
+    ClearEthPhyOcpBit(sc, 0xA5EA, BIT_0);
+    if (sc->re_device_id == RT_DEVICEID_8126)
+        ClearEthPhyOcpBit(sc, 0xB5EA, BIT_1);
+
+    cr2500 = MP_RealReadPhyOcpRegWord(sc, 0xA5D4) &
+        ~(RTK_ADVERTISE_2500FULL | RTK_ADVERTISE_5000FULL);
+    gbcr = MP_ReadPhyUshort(sc, MII_100T2CR) &
+        ~(GTCR_ADV_1000TFDX | GTCR_ADV_1000THDX);
+    anar = MP_ReadPhyUshort(sc, MII_ANAR) &
+        ~(ANAR_10 | ANAR_10_FD | ANAR_TX | ANAR_TX_FD | ANAR_FC | ANAR_PAUSE_ASYM);
+
+    switch (sc->dev->reqSpeed) {
+    case SPEED_AUTO:
+        if (sc->re_device_id == RT_DEVICEID_8126)
+            cr2500 |= RTK_ADVERTISE_5000FULL;
+        cr2500 |= RTK_ADVERTISE_2500FULL;
+        anar = (ANAR_10 | ANAR_10_FD | ANAR_TX | ANAR_TX_FD);
+        gbcr |= (GTCR_ADV_1000TFDX | GTCR_ADV_1000THDX);
+        break;
+    case SPEED_5000:
+        if (sc->re_device_id == RT_DEVICEID_8126) {
+            cr2500 |= RTK_ADVERTISE_5000FULL;
+            break;
+        }
+        /*	FALLTHROUGH in case not 5000 supported */
+    case SPEED_2500:
+        cr2500 |= RTK_ADVERTISE_2500FULL;
+        break;
+    case SPEED_1000:
+        if (sc->dev->reqFullDuplex == FullDuplex)
+            gbcr |= GTCR_ADV_1000TFDX;
+        else
+            gbcr |= GTCR_ADV_1000THDX;
+        break;
+    case SPEED_100:
+        if (sc->dev->reqFullDuplex == FullDuplex)
+            anar |= ANAR_TX_FD;
+        else
+            anar |= ANAR_TX;
+        break;
+        /*	FALLTHROUGH */
+    case SPEED_10:
+        if (sc->dev->reqFullDuplex == FullDuplex)
+            anar |= ANAR_10_FD;
+        else
+            anar |= ANAR_10;
+
+        if (sc->re_type == MACFG_13) {
+            MP_WritePhyUshort(sc, MII_BMCR, 0x8000);
+        }
+        break;
+    default:
+        DBGPRINT1(sc, "Unsupported media type\n");
+        return(0);
+    }
+
+    if (sc->dev->reqFlowControl == FlowControl)
+        anar |= (ANAR_FC | ANAR_PAUSE_ASYM);
+
+    MP_WritePhyUshort(sc, 0x1F, 0x0000);
+    MP_RealWritePhyOcpRegWord(sc, 0xA5D4, cr2500);
+    MP_WritePhyUshort(sc, MII_ANAR, anar);
+    MP_WritePhyUshort(sc, MII_100T2CR, gbcr);
+    MP_WritePhyUshort(sc, MII_BMCR, BMCR_RESET | BMCR_AUTOEN | BMCR_STARTNEG);
+
+    return(0);
+}
+
 
 static int re_enable_EEE(struct re_softc* sc)
 {

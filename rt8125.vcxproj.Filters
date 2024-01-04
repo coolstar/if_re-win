@@ -65,6 +65,9 @@
     <ClCompile Include="interrupt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="link.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="adapter.h">
@@ -110,6 +113,9 @@
       <Filter>Header Files\BSD</Filter>
     </ClInclude>
     <ClInclude Include="interrupt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="link.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
