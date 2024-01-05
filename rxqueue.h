@@ -1,15 +1,28 @@
 #pragma once
 
+//--------------------------------------
+// RCB (Receive Control Block)
+//--------------------------------------
+
+typedef struct _RT_RCB
+{
+	USHORT RxDescIdx;
+} RT_RCB;
+
 typedef struct _RT_RXQUEUE {
 	RT_ADAPTER* Adapter;
 	RT_INTERRUPT* Interrupt;
 
 	NET_RING_COLLECTION const* Rings;
+	RT_RCB* PacketContext;
 
 	// descriptor information
 	WDFCOMMONBUFFER RxdArray;
 	RxDesc* RxdBase;
 	size_t RxdSize;
+
+	USHORT NumRxDesc;
+	USHORT RxDescIndex;
 
 	NET_EXTENSION ChecksumExtension;
 	NET_EXTENSION VirtualAddressExtension;
