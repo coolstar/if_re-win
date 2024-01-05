@@ -31,7 +31,7 @@ void RtlLinkDown(_In_ RT_ADAPTER* adapter) {
     re_stop(sc);
 
     if (adapter->TxQueues[0]) {
-        EvtTxQueueCancel(adapter->TxQueues[0]);
+        RtGetTxQueueContext(adapter->TxQueues[0])->TxDescIndex = 0;
     }
 
     if (adapter->RxQueues[0]) {
