@@ -161,6 +161,7 @@ RtAdapterStart(
 
         NetAdapterSetLinkLayerCapabilities(adapter->NetAdapter, &linkLayerCapabilities);
         NetAdapterSetLinkLayerMtuSize(adapter->NetAdapter, adapter->bsdData.mtu);
+        NetAdapterSetPermanentLinkLayerAddress(adapter->NetAdapter, &adapter->PermanentAddress);
         NetAdapterSetCurrentLinkLayerAddress(adapter->NetAdapter, &adapter->CurrentAddress);
     }
 
