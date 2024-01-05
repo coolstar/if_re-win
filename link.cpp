@@ -34,8 +34,9 @@ void RtlLinkDown(_In_ RT_ADAPTER* adapter) {
         EvtTxQueueCancel(adapter->TxQueues[0]);
     }
 
-    if (adapter->RxQueues[0])
-        EvtRxQueueCancel(adapter->RxQueues[0]);
+    if (adapter->RxQueues[0]) {
+        RxSlideBuffers(RtGetRxQueueContext(adapter->RxQueues[0]));
+    }
 
     if (adapter->isRTL8125)
         re_hw_start_unlock_8125(sc);

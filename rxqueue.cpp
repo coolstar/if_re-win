@@ -83,14 +83,11 @@ Exit:
     return status;
 }
 
-static
-RT_RCB*
-GetRcbFromPacket(
+static UINT32 GetRxIndexFromFragment(
     _In_ RT_RXQUEUE* rx,
-    _In_ UINT32 Index
-)
-{
-    return &rx->PacketContext[Index];
+    _In_ UINT32 fragmentIdx
+) {
+    return (fragmentIdx + rx->NumRxDesc - rx->DescStartIdx) % rx->NumRxDesc;
 }
 
 void
@@ -104,9 +101,10 @@ RxIndicateReceives(
     while (fr->BeginIndex != fr->NextIndex)
     {
         UINT32 const fragmentIndex = fr->BeginIndex;
-        RT_RCB const* rcb = GetRcbFromPacket(rx, fragmentIndex);
 
-        RxDesc const* rxd = &rx->RxdBase[rcb->RxDescIdx];
+        //Calculate Desc Index from fragment
+        UINT32 RxDescIdx = GetRxIndexFromFragment(rx, fragmentIndex);
+        RxDesc const* rxd = &rx->RxdBase[RxDescIdx];
 
         if (0 != rxd->so0.OWN)
             break;
@@ -167,7 +165,29 @@ RtPostRxDescriptor(
     MemoryBarrier();
 }
 
-static
+void
+RxSlideBuffers(
+    _In_ RT_RXQUEUE* rx
+)
+{
+    NET_RING* fr = NetRingCollectionGetFragmentRing(rx->Rings);
+
+    rx->DescStartIdx = fr->BeginIndex;
+    
+    UINT32 index = 0;
+    do {
+        UINT32 RxDescIdx = GetRxIndexFromFragment(rx, index);
+
+        RtPostRxDescriptor(&rx->RxdBase[RxDescIdx],
+            NetExtensionGetFragmentLogicalAddress(&rx->LogicalAddressExtension, index),
+            RxDescIdx == (rx->NumRxDesc - 1));
+
+        index = NetRingIncrementIndex(fr, index);
+    } while (index != 0);
+
+    MemoryBarrier();
+}
+
 void
 RxPostBuffers(
     _In_ RT_RXQUEUE* rx
@@ -177,16 +197,12 @@ RxPostBuffers(
 
     while (fr->NextIndex != fr->EndIndex)
     {
-        RT_RCB *rcb = GetRcbFromPacket(rx, fr->NextIndex);
         UINT32 const index = fr->NextIndex;
+        UINT32 RxDescIdx = GetRxIndexFromFragment(rx, index);
 
-        rcb->RxDescIdx = rx->RxDescIndex;
-
-        RtPostRxDescriptor(&rx->RxdBase[rcb->RxDescIdx],
+        RtPostRxDescriptor(&rx->RxdBase[RxDescIdx],
             NetExtensionGetFragmentLogicalAddress(&rx->LogicalAddressExtension, index),
-            fr->ElementIndexMask == index);
-
-        rx->RxDescIndex = (rx->RxDescIndex + 1) % rx->NumRxDesc;
+            RxDescIdx == (rx->NumRxDesc - 1));
 
         fr->NextIndex = NetRingIncrementIndex(fr, fr->NextIndex);
     }
@@ -210,21 +226,6 @@ RtRxQueueInitialize(
     NET_RING* pr = NetRingCollectionGetPacketRing(rx->Rings);
     NET_RING* fr = NetRingCollectionGetFragmentRing(rx->Rings);
     rx->NumRxDesc = (USHORT)(fr->NumberOfElements > USHORT_MAX ? USHORT_MAX : fr->NumberOfElements);
-
-    WDF_OBJECT_ATTRIBUTES rcbAttributes;
-    WDF_OBJECT_ATTRIBUTES_INIT(&rcbAttributes);
-    rcbAttributes.ParentObject = rxQueue;
-    WDFMEMORY memory = NULL;
-
-    GOTO_IF_NOT_NT_SUCCESS(Exit, status,
-        WdfMemoryCreate(
-            &rcbAttributes,
-            NonPagedPoolNx,
-            0,
-            sizeof(RT_RCB) * pr->NumberOfElements,
-            &memory,
-            (void**)&rx->PacketContext
-        ));
 
     ULONG rxSize;
     GOTO_IF_NOT_NT_SUCCESS(Exit, status,
@@ -272,7 +273,7 @@ EvtRxQueueStart(
 
     RtlZeroMemory(rx->RxdBase, rx->RxdSize);
 
-    rx->RxDescIndex = 0;
+    rx->DescStartIdx = 0;
 
     PHYSICAL_ADDRESS pa = WdfCommonBufferGetAlignedLogicalAddress(rx->RxdArray);
     if (rx->QueueId == 0)
@@ -404,9 +405,8 @@ EvtRxQueueCancel(
     }
 
     NET_RING* fr = NetRingCollectionGetFragmentRing(rx->Rings);
-    fr->BeginIndex = fr->EndIndex;
 
-    rx->RxDescIndex = 0;
+    fr->BeginIndex = fr->EndIndex;
 
     TraceExit();
 }
