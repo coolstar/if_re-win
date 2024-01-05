@@ -137,8 +137,6 @@ RtInitializeHardware(
     UINT16 devID = ConfigRead16(adapter, 2);
     adapter->bsdData.re_device_id = devID;
 
-    DbgPrint("Device ID: 0x%x\n", devID);
-
     GOTO_IF_NOT_NT_SUCCESS(Exit, status,
         BSD_NT_WRAP(re_check_mac_version(&adapter->bsdData)),
         TraceLoggingRtAdapter(adapter));

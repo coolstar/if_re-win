@@ -43,7 +43,7 @@
 
 #define MmioAddr(sc, Reg) Add2Ptr(sc->dev->MMIOAddress, Reg)
 
-#if 1
+#if DEBUG
 #define device_printf(dev, x, ...) DbgPrint(x, __VA_ARGS__)
 #else
 #define device_printf(dev, x, ...) __nop()

@@ -147,7 +147,6 @@ EvtInterruptDpc(
 	}
 
 	if (InterlockedExchange8(&interrupt->linkChg, FALSE)) {
-		DbgPrint("Link Changed\n");
 		RtlCheckLinkStatus(adapter);
 	}
 }
