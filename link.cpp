@@ -2,6 +2,8 @@
 #include "trace.h"
 #include "adapter.h"
 #include "link.h"
+#include "txqueue.h"
+#include "rxqueue.h"
 
 #define MBit 1000000ULL
 
@@ -13,6 +15,7 @@ void RtlLinkUp(_In_ RT_ADAPTER* adapter) {
     re_link_on_patch(sc);
 
     re_stop(sc);
+
     if (adapter->isRTL8125)
         re_hw_start_unlock_8125(sc);
     else
@@ -26,6 +29,14 @@ void RtlLinkDown(_In_ RT_ADAPTER* adapter) {
 
     re_softc* sc = &adapter->bsdData;
     re_stop(sc);
+
+    if (adapter->TxQueues[0]) {
+        EvtTxQueueCancel(adapter->TxQueues[0]);
+    }
+
+    if (adapter->RxQueues[0])
+        EvtRxQueueCancel(adapter->RxQueues[0]);
+
     if (adapter->isRTL8125)
         re_hw_start_unlock_8125(sc);
     else
