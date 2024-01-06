@@ -5,6 +5,8 @@
 #include "trace.h"
 #include "device.h"
 #include "adapter.h"
+#include "txqueue.h"
+#include "rxqueue.h"
 
 NTSTATUS
 RtInitializeAdapterContext(
@@ -175,4 +177,14 @@ Exit:
     TraceExitResult(status);
 
     return status;
+}
+
+void RtResetQueues(_In_ RT_ADAPTER* adapter) {
+    if (adapter->TxQueues[0]) {
+        RtGetTxQueueContext(adapter->TxQueues[0])->TxDescIndex = 0;
+    }
+
+    if (adapter->RxQueues[0]) {
+        RxSlideBuffers(RtGetRxQueueContext(adapter->RxQueues[0]));
+    }
 }

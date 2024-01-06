@@ -2,8 +2,6 @@
 #include "trace.h"
 #include "adapter.h"
 #include "link.h"
-#include "txqueue.h"
-#include "rxqueue.h"
 
 #define MBit 1000000ULL
 
@@ -30,13 +28,7 @@ void RtlLinkDown(_In_ RT_ADAPTER* adapter) {
     re_softc* sc = &adapter->bsdData;
     re_stop(sc);
 
-    if (adapter->TxQueues[0]) {
-        RtGetTxQueueContext(adapter->TxQueues[0])->TxDescIndex = 0;
-    }
-
-    if (adapter->RxQueues[0]) {
-        RxSlideBuffers(RtGetRxQueueContext(adapter->RxQueues[0]));
-    }
+    RtResetQueues(adapter);
 
     if (adapter->isRTL8125)
         re_hw_start_unlock_8125(sc);

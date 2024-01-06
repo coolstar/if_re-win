@@ -81,3 +81,5 @@ UINT8 ConfigRead8(_In_ RT_ADAPTER* adapter, UINT32 reg);
 UINT16 ConfigRead16(_In_ RT_ADAPTER* adapter, UINT32 reg);
 void ConfigWrite8(_In_ RT_ADAPTER* adapter, UINT32 reg, UINT8 val);
 void ConfigWrite16(_In_ RT_ADAPTER* adapter, UINT32 reg, UINT16 val);
+
+void RtResetQueues(_In_ RT_ADAPTER* adapter);
