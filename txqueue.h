@@ -39,9 +39,6 @@ WDF_DECLARE_CONTEXT_TYPE_WITH_NAME(RT_TXQUEUE, RtGetTxQueueContext);
 
 NTSTATUS RtTxQueueInitialize(_In_ NETPACKETQUEUE txQueue, _In_ RT_ADAPTER* adapter);
 
-_Requires_lock_held_(tx->Adapter->Lock)
-void RtTxQueueStart(_In_ RT_TXQUEUE* tx);
-
 EVT_WDF_OBJECT_CONTEXT_DESTROY EvtTxQueueDestroy;
 
 EVT_PACKET_QUEUE_SET_NOTIFICATION_ENABLED EvtTxQueueSetNotificationEnabled;
