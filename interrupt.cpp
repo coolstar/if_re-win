@@ -98,12 +98,15 @@ EvtInterruptIsr(
 	}
 
 done:
-	if (queueDPC)
+	if (queueDPC) {
 		WdfInterruptQueueDpcForIsr(wdfInterrupt);
-	if (adapter->isRTL8125)
-		CSR_WRITE_4(sc, RE_IMR0_8125, RE_INTRS);
-	else
-		CSR_WRITE_2(sc, RE_IMR, RE_INTRS);
+	}
+	else {
+		if (adapter->isRTL8125)
+			CSR_WRITE_4(sc, RE_IMR0_8125, RE_INTRS);
+		else
+			CSR_WRITE_2(sc, RE_IMR, RE_INTRS);
+	}
 	return true;
 }
 
@@ -131,6 +134,7 @@ EvtInterruptDpc(
 
 	RT_INTERRUPT* interrupt = RtGetInterruptContext(Interrupt);
 	RT_ADAPTER* adapter = interrupt->Adapter;
+	re_softc* sc = &adapter->bsdData;
 
 	if (InterlockedExchange8(&interrupt->pciInterrupt, FALSE)) {
 		DbgPrint("PCI Interrupt!");
@@ -149,4 +153,11 @@ EvtInterruptDpc(
 	if (InterlockedExchange8(&interrupt->linkChg, FALSE)) {
 		RtlCheckLinkStatus(adapter);
 	}
+
+	WdfInterruptAcquireLock(adapter->Interrupt->Handle);
+	if (adapter->isRTL8125)
+		CSR_WRITE_4(sc, RE_IMR0_8125, RE_INTRS);
+	else
+		CSR_WRITE_2(sc, RE_IMR, RE_INTRS);
+	WdfInterruptReleaseLock(adapter->Interrupt->Handle);
 }
