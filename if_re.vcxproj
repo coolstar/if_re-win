@@ -209,7 +209,6 @@
     <ClInclude Include="netringiterator.h" />
     <ClInclude Include="power.h" />
     <ClInclude Exclude="@(ClInclude)" Include="precomp.h" />
-    <ClInclude Include="common.h" />
     <ClInclude Include="rxqueue.h" />
     <ClInclude Include="trace.h" />
     <ClInclude Include="txqueue.h" />

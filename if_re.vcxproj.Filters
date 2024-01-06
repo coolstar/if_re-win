@@ -85,9 +85,6 @@
     <ClInclude Include="precomp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="common.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="rxqueue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
