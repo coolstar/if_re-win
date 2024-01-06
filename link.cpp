@@ -2,6 +2,7 @@
 #include "trace.h"
 #include "adapter.h"
 #include "link.h"
+#include "interrupt.h"
 
 #define MBit 1000000ULL
 
@@ -12,20 +13,7 @@ void RtlLinkUp(_In_ RT_ADAPTER* adapter) {
 
     re_link_on_patch(sc);
 
-    re_stop(sc);
-
-    if (adapter->isRTL8125)
-        re_hw_start_unlock_8125(sc);
-    else
-        re_hw_start_unlock(sc);
-
-    TraceExit();
-}
-
-void RtlLinkDown(_In_ RT_ADAPTER* adapter) {
-    TraceEntryNetAdapter(adapter);
-
-    re_softc* sc = &adapter->bsdData;
+    WdfInterruptAcquireLock(adapter->Interrupt->Handle);
     re_stop(sc);
 
     RtResetQueues(adapter);
@@ -34,6 +22,26 @@ void RtlLinkDown(_In_ RT_ADAPTER* adapter) {
         re_hw_start_unlock_8125(sc);
     else
         re_hw_start_unlock(sc);
+    WdfInterruptReleaseLock(adapter->Interrupt->Handle);
+
+    TraceExit();
+}
+
+void RtlLinkDown(_In_ RT_ADAPTER* adapter) {
+    TraceEntryNetAdapter(adapter);
+
+    re_softc* sc = &adapter->bsdData;
+    
+    WdfInterruptAcquireLock(adapter->Interrupt->Handle);
+    re_stop(sc);
+
+    RtResetQueues(adapter);
+
+    if (adapter->isRTL8125)
+        re_hw_start_unlock_8125(sc);
+    else
+        re_hw_start_unlock(sc);
+    WdfInterruptReleaseLock(adapter->Interrupt->Handle);
 
     TraceExit();
 }
