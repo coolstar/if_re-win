@@ -81,13 +81,13 @@ EvtInterruptIsr(
 	}
 
 	/* Rx interrupt */
-	if (status & (RE_ISR_RX_OK | RE_ISR_RX_OVERRUN | RE_ISR_FIFO_OFLOW)) {
+	if (status & (RE_ISR_RX_OK | RE_ISR_FIFO_OFLOW)) {
 		if (!InterlockedExchange8(&interrupt->rxInterrupt, TRUE))
 			queueDPC = TRUE;
 	}
 
 	/* Tx interrupt */
-	if (status & (RE_ISR_TX_OK | RE_ISR_TX_ERR | RE_ISR_TDU)) {
+	if (status & (RE_ISR_TX_OK | RE_ISR_TX_ERR)) {
 		if (!InterlockedExchange8(&interrupt->txInterrupt, TRUE))
 			queueDPC = TRUE;
 	}
