@@ -82,10 +82,8 @@
 #define RE_CMAC_READ_4(sc, reg) (sc->prohibit_access_reg)?0xFFFFFFFF:bus_space_read_4(sc->re_cmac_tag, sc->re_cmac_handle, reg))
 #endif
 
-#define RE_LOCK(_sc)
-#define RE_UNLOCK(_sc)
-#define RE_LOCK_INIT(_sc,_name)
-#define RE_LOCK_DESTROY(_sc)
+#define RE_LOCK(_sc) WdfSpinLockAcquire(_sc->dev->Lock)
+#define RE_UNLOCK(_sc) WdfSpinLockRelease(_sc->dev->Lock)
 #define RE_LOCK_ASSERT(_sc)
 
 #include "mii.h"
