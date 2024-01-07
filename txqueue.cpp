@@ -488,7 +488,5 @@ EvtTxQueueCancel(
     NET_RING* fr = NetRingCollectionGetFragmentRing(tx->Rings);
     fr->BeginIndex = fr->EndIndex;
 
-    tx->TxDescIndex = 0;
-
     TraceExit();
 }
