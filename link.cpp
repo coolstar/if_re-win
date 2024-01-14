@@ -6,6 +6,24 @@
 
 #define MBit 1000000ULL
 
+static void RtlResetLink(_In_ RT_ADAPTER* adapter) {
+    re_softc* sc = &adapter->bsdData;
+
+    WdfInterruptAcquireLock(adapter->Interrupt->Handle);
+    re_stop(sc);
+
+    RtResetQueues(adapter);
+
+    // Init our MAC address
+    re_rar_set(sc, adapter->CurrentAddress.Address);
+
+    if (adapter->isRTL8125)
+        re_hw_start_unlock_8125(sc);
+    else
+        re_hw_start_unlock(sc);
+    WdfInterruptReleaseLock(adapter->Interrupt->Handle);
+}
+
 void RtlLinkUp(_In_ RT_ADAPTER* adapter) {
     TraceEntryNetAdapter(adapter);
 
@@ -13,19 +31,7 @@ void RtlLinkUp(_In_ RT_ADAPTER* adapter) {
 
     re_link_on_patch(sc);
 
-    WdfInterruptAcquireLock(adapter->Interrupt->Handle);
-    re_stop(sc);
-
-    RtResetQueues(adapter);
-
-    // Init our MAC address
-    re_rar_set(sc, adapter->CurrentAddress.Address);
-
-    if (adapter->isRTL8125)
-        re_hw_start_unlock_8125(sc);
-    else
-        re_hw_start_unlock(sc);
-    WdfInterruptReleaseLock(adapter->Interrupt->Handle);
+    RtlResetLink(adapter);
 
     TraceExit();
 }
@@ -33,21 +39,7 @@ void RtlLinkUp(_In_ RT_ADAPTER* adapter) {
 void RtlLinkDown(_In_ RT_ADAPTER* adapter) {
     TraceEntryNetAdapter(adapter);
 
-    re_softc* sc = &adapter->bsdData;
-    
-    WdfInterruptAcquireLock(adapter->Interrupt->Handle);
-    re_stop(sc);
-
-    RtResetQueues(adapter);
-
-    // Init our MAC address
-    re_rar_set(sc, adapter->CurrentAddress.Address);
-
-    if (adapter->isRTL8125)
-        re_hw_start_unlock_8125(sc);
-    else
-        re_hw_start_unlock(sc);
-    WdfInterruptReleaseLock(adapter->Interrupt->Handle);
+    RtlResetLink(adapter);
 
     TraceExit();
 }
