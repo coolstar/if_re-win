@@ -2193,7 +2193,7 @@ void re_hw_init(struct re_softc* sc)
     }
 }
 
-static void re_rar_set(struct re_softc* sc, u_int8_t* eaddr)
+void re_rar_set(struct re_softc* sc, u_int8_t* eaddr)
 {
     re_enable_cfg9346_write(sc);
 

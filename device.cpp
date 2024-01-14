@@ -228,6 +228,9 @@ RtInitializeHardware(
     GOTO_IF_NOT_NT_SUCCESS(Exit, status,
         RtAdapterStart(adapter));
 
+    // Init our MAC address
+    re_rar_set(sc, adapter->CurrentAddress.Address);
+
     if (adapter->isRTL8125) {
         re_hw_start_unlock_8125(sc);
         re_ifmedia_upd_8125(sc);

@@ -18,6 +18,9 @@ void RtlLinkUp(_In_ RT_ADAPTER* adapter) {
 
     RtResetQueues(adapter);
 
+    // Init our MAC address
+    re_rar_set(sc, adapter->CurrentAddress.Address);
+
     if (adapter->isRTL8125)
         re_hw_start_unlock_8125(sc);
     else
@@ -36,6 +39,9 @@ void RtlLinkDown(_In_ RT_ADAPTER* adapter) {
     re_stop(sc);
 
     RtResetQueues(adapter);
+
+    // Init our MAC address
+    re_rar_set(sc, adapter->CurrentAddress.Address);
 
     if (adapter->isRTL8125)
         re_hw_start_unlock_8125(sc);

@@ -31,6 +31,9 @@ EvtDeviceD0Entry(
         re_phy_power_up(sc);
         re_hw_phy_config(sc);
 
+        // Init our MAC address
+        re_rar_set(sc, adapter->CurrentAddress.Address);
+
         if (adapter->isRTL8125) {
             re_hw_start_unlock_8125(sc);
             re_ifmedia_upd_8125(sc);
@@ -56,10 +59,12 @@ EvtDeviceD0Exit(
 
     TraceEntry();
 
+    re_softc* sc = &adapter->bsdData;
+
     if (TargetState != WdfPowerDeviceD3Final)
     {
-        re_softc* sc = &adapter->bsdData;
         re_stop(sc);
+
         re_hw_d3_para(sc);
         sc->prohibit_access_reg = 1;
 
@@ -73,6 +78,10 @@ EvtDeviceD0Exit(
             NetAdapterAutoNegotiationFlagNone);
 
         NetAdapterSetLinkState(adapter->NetAdapter, &linkState);
+    }
+    else {
+        // Reset MAC address
+        re_rar_set(sc, adapter->PermanentAddress.Address);
     }
 
     TraceExitResult(STATUS_SUCCESS);
