@@ -5765,39 +5765,39 @@ int re_ifmedia_upd(struct re_softc* sc)
     anar = MP_ReadPhyUshort(sc, MII_ANAR) &
         ~(ANAR_10 | ANAR_10_FD | ANAR_TX | ANAR_TX_FD | ANAR_FC | ANAR_PAUSE_ASYM);
 
-    switch (sc->dev->reqSpeed) {
-    case SPEED_AUTO:
+    switch (sc->dev->SpeedDuplex) {
+    case RtSpeedDuplexModeAutoNegotiation:
         anar = (ANAR_10 | ANAR_10_FD | ANAR_TX | ANAR_TX_FD);
         gbcr |= (GTCR_ADV_1000TFDX | GTCR_ADV_1000THDX);
         break;
-
-    case SPEED_1000:
-        if (sc->dev->reqFullDuplex == FullDuplex)
-            gbcr |= GTCR_ADV_1000TFDX;
-        else
-            gbcr |= GTCR_ADV_1000THDX;
+    case RtSpeedDuplexMode1GFullDuplex:
+        gbcr |= GTCR_ADV_1000TFDX;
         break;
-    case SPEED_100:
-        if (sc->dev->reqFullDuplex == FullDuplex)
-            anar |= ANAR_TX_FD;
-        else
-            anar |= ANAR_TX;
+    case RtSpeedDuplexMode1GHalfDuplex:
+        gbcr |= GTCR_ADV_1000THDX;
         break;
-        /*	FALLTHROUGH */
-    case SPEED_10:
-        if (sc->dev->reqFullDuplex == FullDuplex)
-            anar |= ANAR_10_FD;
-        else
-            anar |= ANAR_10;
-
-        if (sc->re_type == MACFG_13) {
-            MP_WritePhyUshort(sc, MII_BMCR, 0x8000);
-        }
-
+    case RtSpeedDuplexMode100MFullDuplex:
+        anar |= ANAR_TX_FD;
+        break;
+    case RtSpeedDuplexMode100MHalfDuplex:
+        anar |= ANAR_TX;
+        break;
+    case RtSpeedDuplexMode10MFullDuplex:
+        anar |= ANAR_10_FD;
+        break;
+    case RtSpeedDuplexMode10MHalfDuplex:
+        anar |= ANAR_10;
         break;
     default:
         DBGPRINT1(sc, "Unsupported media type\n");
         return(0);
+    }
+
+    if (sc->dev->SpeedDuplex == RtSpeedDuplexMode10MFullDuplex ||
+        sc->dev->SpeedDuplex == RtSpeedDuplexMode10MHalfDuplex) {
+        if (sc->re_type == MACFG_13) {
+            MP_WritePhyUshort(sc, MII_BMCR, 0x8000);
+        }
     }
 
     if (sc->re_device_id == RT_DEVICEID_8162)
@@ -5848,49 +5848,51 @@ int re_ifmedia_upd_8125(struct re_softc* sc)
     anar = MP_ReadPhyUshort(sc, MII_ANAR) &
         ~(ANAR_10 | ANAR_10_FD | ANAR_TX | ANAR_TX_FD | ANAR_FC | ANAR_PAUSE_ASYM);
 
-    switch (sc->dev->reqSpeed) {
-    case SPEED_AUTO:
+    switch (sc->dev->SpeedDuplex) {
+    case RtSpeedDuplexModeAutoNegotiation:
         if (sc->re_device_id == RT_DEVICEID_8126)
             cr2500 |= RTK_ADVERTISE_5000FULL;
         cr2500 |= RTK_ADVERTISE_2500FULL;
         anar = (ANAR_10 | ANAR_10_FD | ANAR_TX | ANAR_TX_FD);
         gbcr |= (GTCR_ADV_1000TFDX | GTCR_ADV_1000THDX);
         break;
-    case SPEED_5000:
+    case RtSpeedDuplexMode5GFullDuplex:
         if (sc->re_device_id == RT_DEVICEID_8126) {
             cr2500 |= RTK_ADVERTISE_5000FULL;
             break;
         }
         /*	FALLTHROUGH in case not 5000 supported */
-    case SPEED_2500:
+    case RtSpeedDuplexMode2GFullDuplex:
         cr2500 |= RTK_ADVERTISE_2500FULL;
         break;
-    case SPEED_1000:
-        if (sc->dev->reqFullDuplex == FullDuplex)
-            gbcr |= GTCR_ADV_1000TFDX;
-        else
-            gbcr |= GTCR_ADV_1000THDX;
+    case RtSpeedDuplexMode1GFullDuplex:
+        gbcr |= GTCR_ADV_1000TFDX;
         break;
-    case SPEED_100:
-        if (sc->dev->reqFullDuplex == FullDuplex)
-            anar |= ANAR_TX_FD;
-        else
-            anar |= ANAR_TX;
+    case RtSpeedDuplexMode1GHalfDuplex:
+        gbcr |= GTCR_ADV_1000THDX;
         break;
-        /*	FALLTHROUGH */
-    case SPEED_10:
-        if (sc->dev->reqFullDuplex == FullDuplex)
-            anar |= ANAR_10_FD;
-        else
-            anar |= ANAR_10;
-
-        if (sc->re_type == MACFG_13) {
-            MP_WritePhyUshort(sc, MII_BMCR, 0x8000);
-        }
+    case RtSpeedDuplexMode100MFullDuplex:
+        anar |= ANAR_TX_FD;
+        break;
+    case RtSpeedDuplexMode100MHalfDuplex:
+        anar |= ANAR_TX;
+        break;
+    case RtSpeedDuplexMode10MFullDuplex:
+        anar |= ANAR_10_FD;
+        break;
+    case RtSpeedDuplexMode10MHalfDuplex:
+        anar |= ANAR_10;
         break;
     default:
         DBGPRINT1(sc, "Unsupported media type\n");
         return(0);
+    }
+
+    if (sc->dev->SpeedDuplex == RtSpeedDuplexMode10MFullDuplex ||
+        sc->dev->SpeedDuplex == RtSpeedDuplexMode10MHalfDuplex) {
+        if (sc->re_type == MACFG_13) {
+            MP_WritePhyUshort(sc, MII_BMCR, 0x8000);
+        }
     }
 
     if (sc->dev->reqFlowControl == FlowControl)

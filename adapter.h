@@ -7,19 +7,17 @@
 #define RT_MAX_RX_QUEUES (4)
 #define RT_MAX_QUEUES RT_MAX_RX_QUEUES
 
-typedef enum REQ_SPEED {
-    SPEED_AUTO,
-    SPEED_5000,
-    SPEED_2500,
-    SPEED_1000,
-    SPEED_100,
-    SPEED_10
-};
-
-typedef enum DUPL_MODE {
-    FullDuplex,
-    HalfDuplex
-};
+typedef enum REG_SPEED_SETTING {
+    RtSpeedDuplexModeAutoNegotiation = 0,
+    RtSpeedDuplexMode10MHalfDuplex = 1,
+    RtSpeedDuplexMode10MFullDuplex = 2,
+    RtSpeedDuplexMode100MHalfDuplex = 3,
+    RtSpeedDuplexMode100MFullDuplex = 4,
+    RtSpeedDuplexMode1GHalfDuplex = 5,
+    RtSpeedDuplexMode1GFullDuplex = 6,
+    RtSpeedDuplexMode2GFullDuplex = 7,
+    RtSpeedDuplexMode5GFullDuplex = 8
+} REG_SPEED_SETTING;
 
 typedef enum FLOW_CTRL {
     FlowControl,
@@ -49,14 +47,15 @@ typedef struct _RT_ADAPTER
     // Pointer to interrupt object
     RT_INTERRUPT* Interrupt;
 
+    // Configuration
+    REG_SPEED_SETTING SpeedDuplex;
     NET_ADAPTER_LINK_LAYER_ADDRESS PermanentAddress;
     NET_ADAPTER_LINK_LAYER_ADDRESS CurrentAddress;
+    BOOLEAN OverrideAddress;
 
     BOOLEAN isRTL8125;
     ULONG64 MaxSpeed;
 
-    REQ_SPEED reqSpeed;
-    DUPL_MODE reqFullDuplex;
     FLOW_CTRL reqFlowControl;
 
     struct re_softc bsdData;

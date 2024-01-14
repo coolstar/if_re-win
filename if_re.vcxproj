@@ -199,6 +199,7 @@
     <ClInclude Include="adapter.h" />
     <ClInclude Include="bsd.h" />
     <ClInclude Include="bsdexport.h" />
+    <ClInclude Include="configuration.h" />
     <ClInclude Include="device.h" />
     <ClInclude Include="ethernet.h" />
     <ClInclude Include="forward.h" />
@@ -215,6 +216,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="adapter.cpp" />
+    <ClCompile Include="configuration.cpp" />
     <ClCompile Include="device.cpp" />
     <ClCompile Include="driver.cpp" />
     <ClCompile Include="interrupt.cpp" />

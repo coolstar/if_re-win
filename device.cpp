@@ -5,6 +5,7 @@
 #include "trace.h"
 #include "device.h"
 #include "adapter.h"
+#include "configuration.h"
 
 NTSTATUS
 RtGetResources(
@@ -126,6 +127,9 @@ RtInitializeHardware(
     re_softc* sc = &adapter->bsdData;
 
     GOTO_IF_NOT_NT_SUCCESS(Exit, status,
+        RtAdapterReadConfiguration(adapter));
+
+    GOTO_IF_NOT_NT_SUCCESS(Exit, status,
         RtGetResources(adapter, resourcesRaw, resourcesTranslated));
 
     RtlZeroMemory(&adapter->bsdData, sizeof(adapter->bsdData));
@@ -143,8 +147,6 @@ RtInitializeHardware(
 
     re_init_software_variable(&adapter->bsdData);
 
-    adapter->reqSpeed = SPEED_AUTO;
-    adapter->reqFullDuplex = FullDuplex;
     adapter->reqFlowControl = FlowControl;
 
     GOTO_IF_NOT_NT_SUCCESS(Exit, status,
@@ -167,7 +169,9 @@ RtInitializeHardware(
     re_get_hw_mac_address(&adapter->bsdData, adapter->PermanentAddress.Address);
     adapter->PermanentAddress.Length = ETHERNET_LENGTH_OF_ADDRESS;
 
-    RtlCopyMemory(&adapter->CurrentAddress, &adapter->PermanentAddress, sizeof(adapter->PermanentAddress));
+    if (adapter->OverrideAddress) {
+        RtlCopyMemory(&adapter->CurrentAddress, &adapter->PermanentAddress, sizeof(adapter->PermanentAddress));
+    }
 
     re_phy_power_up(sc);
     re_hw_phy_config(sc);

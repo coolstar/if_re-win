@@ -69,6 +69,12 @@ BusType                 = 5     ; PCIBus
 
 AddReg                  = ndi.reg
 
+; To make it easier to share common keywords across different devices, we have
+; a separate AddReg section for each Advanced Keyword.
+; TODO: Add or remove keywords depending on the features your NIC supports.
+AddReg                  = Speed.kw
+AddReg                  = NetworkAddress.kw
+
 [ndi.reg]
 ; TODO: Update these if your device is not Ethernet.
 ; Note that "ndis5" simply means to bind to TCPIP; it is not a version number.
@@ -111,7 +117,40 @@ IF_RE.CopyFiles   = 13
 [SourceDisksFiles]
 if_re.sys         = 1
 
+;
+; Advanced Keywords
+;
+[Speed.kw]
+HKR,Ndi\params\*SpeedDuplex,                    ParamDesc,      0,  %SpeedDuplex%
+HKR,Ndi\params\*SpeedDuplex,                    default,        0,  "0"
+HKR,Ndi\params\*SpeedDuplex,                    type,           0,  "enum"
+HKR,Ndi\params\*SpeedDuplex\enum,               "0",            0,  %AutoDetect%
+HKR,Ndi\params\*SpeedDuplex\enum,               "1",            0,  %10Mb-Half-Duplex%
+HKR,Ndi\params\*SpeedDuplex\enum,               "2",            0,  %10Mb-Full-Duplex%
+HKR,Ndi\params\*SpeedDuplex\enum,               "3",            0,  %100Mb-Half-Duplex%
+HKR,Ndi\params\*SpeedDuplex\enum,               "4",            0,  %100Mb-Full-Duplex%
+HKR,Ndi\params\*SpeedDuplex\enum,               "5",            0,  %1000Mb-Half-Duplex%
+HKR,Ndi\params\*SpeedDuplex\enum,               "6",            0,  %1000Mb-Full-Duplex%
+
+[NetworkAddress.kw]
+HKR,Ndi\params\NetworkAddress,                  ParamDesc,      0,  %NetworkAddress%
+HKR,Ndi\params\NetworkAddress,                  type,           0,  "edit"
+HKR,Ndi\params\NetworkAddress,                  default,        0,  ""
+HKR,Ndi\params\NetworkAddress,                  LimitText,      0,  "12"
+HKR,Ndi\params\NetworkAddress,                  UpperCase,      0,  "1"
+HKR,Ndi\params\NetworkAddress,                  Optional,       0,  "1"
+
 [Strings]
+AutoDetect               = "Auto Negotiation"
+SpeedDuplex              = "Speed & Duplex"
+10Mb-Half-Duplex         = "10 Mbps Half Duplex"
+10Mb-Full-Duplex         = "10 Mbps Full Duplex"
+100Mb-Half-Duplex        = "100 Mbps Half Duplex"
+100Mb-Full-Duplex        = "100 Mbps Full Duplex"
+1000Mb-Half-Duplex       = "1.0 Gbps Half Duplex"
+1000Mb-Full-Duplex       = "1.0 Gbps Full Duplex"
+NetworkAddress           = "Network Address"
+
 SPSVCINST_ASSOCSERVICE= 0x00000002
 StdMfg                 = "Realtek"
 DiskDescription        = "Realtek Ethernet Controller Installation Disk #1"
