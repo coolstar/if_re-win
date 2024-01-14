@@ -56,9 +56,8 @@ Exit:
 
 }
 
-static EVT_NET_ADAPTER_SET_RECEIVE_FILTER AdapterSetReceiveFilter;
 static void
-RtSetReceiveFilter(
+EvtSetReceiveFilter(
     _In_ NETADAPTER netAdapter,
     _In_ NETRECEIVEFILTER receiveFilter)
 {
@@ -100,6 +99,24 @@ RtSetReceiveFilter(
 
 static
 void
+RtAdapterSetReceiveFilterCapabilities(
+    _In_ RT_ADAPTER const* adapter
+)
+{
+    NET_ADAPTER_RECEIVE_FILTER_CAPABILITIES rxFilterCaps;
+    NET_ADAPTER_RECEIVE_FILTER_CAPABILITIES_INIT(&rxFilterCaps, EvtSetReceiveFilter);
+    rxFilterCaps.SupportedPacketFilters =
+        NetPacketFilterFlagDirected |
+        NetPacketFilterFlagMulticast |
+        NetPacketFilterFlagAllMulticast |
+        NetPacketFilterFlagBroadcast |
+        NetPacketFilterFlagPromiscuous;
+    rxFilterCaps.MaximumMulticastAddresses = 1; // TODO: Packet filter.
+    NetAdapterSetReceiveFilterCapabilities(adapter->NetAdapter, &rxFilterCaps);
+}
+
+static
+void
 RtAdapterSetDatapathCapabilities(
     _In_ RT_ADAPTER const* adapter
 )
@@ -130,17 +147,6 @@ RtAdapterSetDatapathCapabilities(
     rxCapabilities.FragmentRingNumberOfElementsHint = RE_RX_BUF_NUM;
 
     NetAdapterSetDataPathCapabilities(adapter->NetAdapter, &txCapabilities, &rxCapabilities);
-
-    NET_ADAPTER_RECEIVE_FILTER_CAPABILITIES rxFilterCaps;
-    NET_ADAPTER_RECEIVE_FILTER_CAPABILITIES_INIT(&rxFilterCaps, RtSetReceiveFilter);
-    rxFilterCaps.SupportedPacketFilters =
-        NetPacketFilterFlagDirected |
-        NetPacketFilterFlagMulticast |
-        NetPacketFilterFlagAllMulticast |
-        NetPacketFilterFlagBroadcast |
-        NetPacketFilterFlagPromiscuous;
-    rxFilterCaps.MaximumMulticastAddresses = 1; // TODO: Packet filter.
-    NetAdapterSetReceiveFilterCapabilities(adapter->NetAdapter, &rxFilterCaps);
 }
 
 _Use_decl_annotations_
@@ -166,6 +172,8 @@ RtAdapterStart(
         NetAdapterSetPermanentLinkLayerAddress(adapter->NetAdapter, &adapter->PermanentAddress);
         NetAdapterSetCurrentLinkLayerAddress(adapter->NetAdapter, &adapter->CurrentAddress);
     }
+
+    RtAdapterSetReceiveFilterCapabilities(adapter);
 
     RtAdapterSetDatapathCapabilities(adapter);
 
