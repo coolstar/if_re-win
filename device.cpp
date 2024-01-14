@@ -147,8 +147,6 @@ RtInitializeHardware(
 
     re_init_software_variable(&adapter->bsdData);
 
-    adapter->reqFlowControl = FlowControl;
-
     GOTO_IF_NOT_NT_SUCCESS(Exit, status,
         RtRegisterScatterGatherDma(adapter),
         TraceLoggingRtAdapter(adapter));

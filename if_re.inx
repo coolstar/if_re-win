@@ -74,6 +74,7 @@ AddReg                  = ndi.reg
 ; TODO: Add or remove keywords depending on the features your NIC supports.
 AddReg                  = Speed.kw
 AddReg                  = NetworkAddress.kw
+AddReg                  = FlowControl.kw
 
 [ndi.reg]
 ; TODO: Update these if your device is not Ethernet.
@@ -140,6 +141,15 @@ HKR,Ndi\params\NetworkAddress,                  LimitText,      0,  "12"
 HKR,Ndi\params\NetworkAddress,                  UpperCase,      0,  "1"
 HKR,Ndi\params\NetworkAddress,                  Optional,       0,  "1"
 
+[FlowControl.kw]
+HKR,Ndi\params\*FlowControl,                    ParamDesc,      0,  %FlowControl%
+HKR,Ndi\params\*FlowControl,                    default,        0,  "3"
+HKR,Ndi\params\*FlowControl,                    type,           0,  "enum"
+HKR,Ndi\params\*FlowControl\enum,               "0",            0,  %Disabled%
+HKR,Ndi\params\*FlowControl\enum,               "1",            0,  %TxEnabled%
+HKR,Ndi\params\*FlowControl\enum,               "2",            0,  %RxEnabled%
+HKR,Ndi\params\*FlowControl\enum,               "3",            0,  %RxTxEnabled%
+
 [Strings]
 AutoDetect               = "Auto Negotiation"
 SpeedDuplex              = "Speed & Duplex"
@@ -150,6 +160,11 @@ SpeedDuplex              = "Speed & Duplex"
 1000Mb-Half-Duplex       = "1.0 Gbps Half Duplex"
 1000Mb-Full-Duplex       = "1.0 Gbps Full Duplex"
 NetworkAddress           = "Network Address"
+Disabled                 = "Disabled"
+TxEnabled                = "Tx Enabled"
+RxEnabled                = "Rx Enabled"
+RxTxEnabled              = "Rx & Tx Enabled"
+FlowControl              = "Flow Control"
 
 SPSVCINST_ASSOCSERVICE= 0x00000002
 StdMfg                 = "Realtek"

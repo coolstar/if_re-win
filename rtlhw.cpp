@@ -5815,16 +5815,34 @@ int re_ifmedia_upd(struct re_softc* sc)
     if (sc->re_device_id == RT_DEVICEID_8169 || sc->re_device_id == RT_DEVICEID_8169SC ||
         sc->re_device_id == RT_DEVICEID_8168 || sc->re_device_id == RT_DEVICEID_8161 ||
         sc->re_device_id == RT_DEVICEID_8162) {
-        if (sc->dev->reqFlowControl == FlowControl)
+        switch (sc->dev->FlowControl) {
+        case FlowControlTxOnly:
+            anar |= ANAR_PAUSE_ASYM;
+            break;
+        case FlowControlRxOnly:
+            anar |= ANAR_FC;
+            break;
+        case FlowControlTxRx:
             anar |= (ANAR_FC | ANAR_PAUSE_ASYM);
+            break;
+        }
 
         MP_WritePhyUshort(sc, MII_ANAR, anar);
         MP_WritePhyUshort(sc, MII_100T2CR, gbcr);
         MP_WritePhyUshort(sc, MII_BMCR, BMCR_RESET | BMCR_AUTOEN | BMCR_STARTNEG);
     }
     else if (sc->re_type == MACFG_36) {
-        if (sc->dev->reqFlowControl == FlowControl)
+        switch (sc->dev->FlowControl) {
+        case FlowControlTxOnly:
+            anar |= ANAR_PAUSE_ASYM;
+            break;
+        case FlowControlRxOnly:
+            anar |= ANAR_FC;
+            break;
+        case FlowControlTxRx:
             anar |= (ANAR_FC | ANAR_PAUSE_ASYM);
+            break;
+        }
 
         MP_WritePhyUshort(sc, MII_ANAR, anar);
         MP_WritePhyUshort(sc, MII_BMCR, BMCR_RESET | BMCR_AUTOEN | BMCR_STARTNEG);
@@ -5903,8 +5921,17 @@ int re_ifmedia_upd_8125(struct re_softc* sc)
         }
     }
 
-    if (sc->dev->reqFlowControl == FlowControl)
+    switch (sc->dev->FlowControl) {
+    case FlowControlTxOnly:
+        anar |= ANAR_PAUSE_ASYM;
+        break;
+    case FlowControlRxOnly:
+        anar |= ANAR_FC;
+        break;
+    case FlowControlTxRx:
         anar |= (ANAR_FC | ANAR_PAUSE_ASYM);
+        break;
+    }
 
     MP_WritePhyUshort(sc, 0x1F, 0x0000);
     MP_RealWritePhyOcpRegWord(sc, 0xA5D4, cr2500);

@@ -34,6 +34,7 @@ RT_ADVANCED_PROPERTY RtSupportedProperties[] =
 
     // Standard Keywords
     { NDIS_STRING_CONST("*SpeedDuplex"),             RT_OFFSET(SpeedDuplex),              RT_SIZE(SpeedDuplex),              RtSpeedDuplexModeAutoNegotiation, RtSpeedDuplexModeAutoNegotiation, RtSpeedDuplexMode1GFullDuplex },
+    { NDIS_STRING_CONST("*FlowControl"),             RT_OFFSET(FlowControl),              RT_SIZE(FlowControl),              FlowControlTxRx,                  NoFlowControl,                    FlowControlTxRx },
 };
 
 NTSTATUS

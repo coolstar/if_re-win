@@ -91,17 +91,25 @@ void RtlCheckLinkStatus(_In_ RT_ADAPTER* adapter) {
                 NetAdapterAutoNegotiationFlagDuplexAutoNegotiated;
         }
 
-        if (adapter->reqFlowControl != NoFlowControl) {
+        if (adapter->FlowControl != NoFlowControl) {
             autoNegotiationFlags |=
                 NetAdapterAutoNegotiationFlagPauseFunctionsAutoNegotiated;
         }
 
         NET_ADAPTER_PAUSE_FUNCTION_TYPE pauseFunctions = NetAdapterPauseFunctionTypeUnknown;
-        if (adapter->reqFlowControl == NoFlowControl) {
+        switch (adapter->FlowControl) {
+        case NoFlowControl:
             pauseFunctions = NetAdapterPauseFunctionTypeUnsupported;
-        }
-        else {
+            break;
+        case FlowControlRxOnly:
+            pauseFunctions = NetAdapterPauseFunctionTypeReceiveOnly;
+            break;
+        case FlowControlTxOnly:
+            pauseFunctions = NetAdapterPauseFunctionTypeSendOnly;
+            break;
+        case FlowControlTxRx:
             pauseFunctions = NetAdapterPauseFunctionTypeSendAndReceive;
+            break;
         }
 
         NET_ADAPTER_LINK_STATE linkState;

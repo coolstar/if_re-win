@@ -20,8 +20,10 @@ typedef enum REG_SPEED_SETTING {
 } REG_SPEED_SETTING;
 
 typedef enum FLOW_CTRL {
-    FlowControl,
-    NoFlowControl
+    NoFlowControl = 0,
+    FlowControlTxOnly = 1,
+    FlowControlRxOnly = 2,
+    FlowControlTxRx = 3
 };
 
 typedef struct _RT_ADAPTER
@@ -52,11 +54,10 @@ typedef struct _RT_ADAPTER
     NET_ADAPTER_LINK_LAYER_ADDRESS PermanentAddress;
     NET_ADAPTER_LINK_LAYER_ADDRESS CurrentAddress;
     BOOLEAN OverrideAddress;
+    FLOW_CTRL FlowControl;
 
     BOOLEAN isRTL8125;
     ULONG64 MaxSpeed;
-
-    FLOW_CTRL reqFlowControl;
 
     struct re_softc bsdData;
 } RT_ADAPTER, * PRT_ADAPTER;
