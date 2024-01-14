@@ -117,6 +117,24 @@ RtAdapterSetReceiveFilterCapabilities(
 
 static
 void
+RtAdapterSetLinkLayerCapabilities(
+    _In_ RT_ADAPTER* adapter
+)
+{
+    NET_ADAPTER_LINK_LAYER_CAPABILITIES linkLayerCapabilities;
+    NET_ADAPTER_LINK_LAYER_CAPABILITIES_INIT(
+        &linkLayerCapabilities,
+        adapter->MaxSpeed,
+        adapter->MaxSpeed);
+
+    NetAdapterSetLinkLayerCapabilities(adapter->NetAdapter, &linkLayerCapabilities);
+    NetAdapterSetLinkLayerMtuSize(adapter->NetAdapter, adapter->bsdData.mtu);
+    NetAdapterSetPermanentLinkLayerAddress(adapter->NetAdapter, &adapter->PermanentAddress);
+    NetAdapterSetCurrentLinkLayerAddress(adapter->NetAdapter, &adapter->CurrentAddress);
+}
+
+static
+void
 RtAdapterSetDatapathCapabilities(
     _In_ RT_ADAPTER const* adapter
 )
@@ -159,19 +177,7 @@ RtAdapterStart(
 
     NTSTATUS status = STATUS_SUCCESS;
 
-    {
-        //barebones init 
-        NET_ADAPTER_LINK_LAYER_CAPABILITIES linkLayerCapabilities;
-        NET_ADAPTER_LINK_LAYER_CAPABILITIES_INIT(
-            &linkLayerCapabilities,
-            adapter->MaxSpeed,
-            adapter->MaxSpeed);
-
-        NetAdapterSetLinkLayerCapabilities(adapter->NetAdapter, &linkLayerCapabilities);
-        NetAdapterSetLinkLayerMtuSize(adapter->NetAdapter, adapter->bsdData.mtu);
-        NetAdapterSetPermanentLinkLayerAddress(adapter->NetAdapter, &adapter->PermanentAddress);
-        NetAdapterSetCurrentLinkLayerAddress(adapter->NetAdapter, &adapter->CurrentAddress);
-    }
+    RtAdapterSetLinkLayerCapabilities(adapter);
 
     RtAdapterSetReceiveFilterCapabilities(adapter);
 
