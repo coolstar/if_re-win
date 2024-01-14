@@ -5488,6 +5488,14 @@ u_int8_t re_link_ok(struct re_softc* sc)
     return retval;
 }
 
+u_int8_t re_link_autoneg(struct re_softc* sc) {
+    MP_WritePhyUshort(sc, 0x1F, 0x0000);
+    u_int16_t aner = MP_ReadPhyUshort(sc, MII_ANER);
+    u_int16_t bmsr = MP_ReadPhyUshort(sc, MII_BMSR);
+
+    return ((aner & ANER_LPAN) && (bmsr & BMSR_ACOMP)) ? 1 : 0;
+}
+
 static void
 re_set_wol_linkspeed(struct re_softc* sc)
 {

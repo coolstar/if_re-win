@@ -49,8 +49,11 @@ void RtlCheckLinkStatus(_In_ RT_ADAPTER* adapter) {
 
     re_softc* sc = &adapter->bsdData;
 
-    if (re_link_ok(&adapter->bsdData)) {
+    if (re_link_ok(sc)) {
         RtlLinkUp(adapter);
+
+        // Check Autonegotiation
+        BOOLEAN LinkAutoNeg = re_link_autoneg(sc);
 
         UINT32 msr = 0;
 
@@ -80,14 +83,35 @@ void RtlCheckLinkStatus(_In_ RT_ADAPTER* adapter) {
         else if (msr & RL_PHY_STATUS_5000MF)
             linkSpeed = 5000 * MBit;
 
+        NET_ADAPTER_AUTO_NEGOTIATION_FLAGS autoNegotiationFlags = NetAdapterAutoNegotiationFlagNone;
+        if (LinkAutoNeg) {
+            autoNegotiationFlags |= 
+                NetAdapterAutoNegotiationFlagXmitLinkSpeedAutoNegotiated |
+                NetAdapterAutoNegotiationFlagRcvLinkSpeedautoNegotiated |
+                NetAdapterAutoNegotiationFlagDuplexAutoNegotiated;
+        }
+
+        if (adapter->reqFlowControl != NoFlowControl) {
+            autoNegotiationFlags |=
+                NetAdapterAutoNegotiationFlagPauseFunctionsAutoNegotiated;
+        }
+
+        NET_ADAPTER_PAUSE_FUNCTION_TYPE pauseFunctions = NetAdapterPauseFunctionTypeUnknown;
+        if (adapter->reqFlowControl == NoFlowControl) {
+            pauseFunctions = NetAdapterPauseFunctionTypeUnsupported;
+        }
+        else {
+            pauseFunctions = NetAdapterPauseFunctionTypeSendAndReceive;
+        }
+
         NET_ADAPTER_LINK_STATE linkState;
         NET_ADAPTER_LINK_STATE_INIT(
             &linkState,
             linkSpeed,
             MediaConnectStateConnected,
             duplexState,
-            NetAdapterPauseFunctionTypeUnknown,
-            NetAdapterAutoNegotiationFlagNone);
+            pauseFunctions,
+            autoNegotiationFlags);
         NetAdapterSetLinkState(adapter->NetAdapter, &linkState);
     }
     else {
