@@ -238,7 +238,9 @@ RtIsPacketTransferComplete(
     if (!packet->Ignore)
     {
         RT_TCB const* tcb = GetTcbFromPacket(tx, NetPacketIteratorGetIndex(pi));
-        TxDesc* txd = &tx->TxdBase[tcb->FirstTxDescIdx];
+        size_t txDescIdx = (tcb->FirstTxDescIdx + tcb->NumTxDesc - 1) % tx->NumTxDesc;
+
+        TxDesc* txd = &tx->TxdBase[txDescIdx];
 
         // Look at the status flags on the last fragment in the packet.
         // If the hardware-ownership flag is still set, then the packet isn't done.
