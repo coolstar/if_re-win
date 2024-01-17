@@ -182,13 +182,9 @@ RtProgramOffloadDescriptor(
     BOOLEAN checksumEnabled = tx->ChecksumExtension.Enabled &&
         (adapter->TxTcpHwChkSum || adapter->TxIpHwChkSum || adapter->TxUdpHwChkSum);
 
-    DbgPrint("Checksum Enabled? %d\n", checksumEnabled);
-
     if (checksumEnabled) {
         NET_PACKET_CHECKSUM* checksumInfo =
             NetExtensionGetPacketChecksum(&tx->ChecksumExtension, packetIndex);
-
-        DbgPrint("IPv4? %d, IPv6? %d\n", NetPacketIsIpv4(packet), NetPacketIsIpv6(packet));
 
         if (NetPacketIsIpv4(packet)) {
             // Prioritize layer4 checksum first

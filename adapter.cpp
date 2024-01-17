@@ -192,8 +192,6 @@ RtAdapterSetOffloadCapabilities(
     const struct re_softc* sc = &adapter->bsdData;
 
     BOOLEAN checksumSupported = (sc->if_hwassist & RE_CSUM_FEATURES) != 0;
-    DbgPrint("Checksum Supported? %d 0x%x\n", checksumSupported, sc->if_hwassist);
-
     if (!checksumSupported) {
         return;
     }
