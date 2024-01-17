@@ -785,6 +785,8 @@ struct re_softc {
     int			 max_jumbo_frame_size;
     int			 re_rx_mbuf_sz;
     int			 re_if_flags;
+    int 		 re_tx_cstag;
+    int			 re_rx_cstag;
 
     u_int8_t RequireAdcBiasPatch;
     u_int16_t AdcBiasPatchIoffset;
@@ -829,6 +831,9 @@ struct re_softc {
     //Our Additions
     u_int16_t mtu;
     u_int8_t eee_enable;
+
+    int if_capenable;
+    int if_hwassist;
 };
 
 enum bits {

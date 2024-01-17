@@ -147,6 +147,24 @@ RtInitializeHardware(
 
     re_init_software_variable(&adapter->bsdData);
 
+    if ((sc->re_type == MACFG_24) || (sc->re_type == MACFG_25) || (sc->re_type == MACFG_26))
+        sc->if_hwassist |= CSUM_TCP | CSUM_UDP;
+    else
+        sc->if_hwassist |= RE_CSUM_FEATURES;
+    sc->if_capenable = IFCAP_HWCSUM | IFCAP_HWCSUM_IPV6;
+    /* TSO capability setup */
+    if (sc->re_if_flags & RL_FLAG_8168G_PLUS) {
+        sc->if_hwassist |= CSUM_TSO;
+        sc->if_capenable |= IFCAP_TSO;
+    }
+    /* RTL8169/RTL8101E/RTL8168B not support TSO v6 */
+    if (!(sc->re_if_flags & RL_FLAG_DESCV2)) {
+        sc->if_hwassist &= ~(CSUM_IP6_TSO |
+            CSUM_TCP_IPV6 |
+            CSUM_UDP_IPV6);
+        sc->if_capenable &= ~(IFCAP_TSO6 | IFCAP_HWCSUM_IPV6);
+    }
+
     GOTO_IF_NOT_NT_SUCCESS(Exit, status,
         RtRegisterScatterGatherDma(adapter),
         TraceLoggingRtAdapter(adapter));

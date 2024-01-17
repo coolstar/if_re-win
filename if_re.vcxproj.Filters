@@ -124,5 +124,11 @@
     <ClInclude Include="configuration.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="if.h">
+      <Filter>Header Files\BSD</Filter>
+    </ClInclude>
+    <ClInclude Include="mbuf.h">
+      <Filter>Header Files\BSD</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

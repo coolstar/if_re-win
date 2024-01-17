@@ -3466,6 +3466,8 @@ void re_hw_start_unlock(struct re_softc* sc)
     u_int16_t		data16 = 0;
     u_int32_t		Data32;
 
+    struct re_softc* ifp = sc;
+
     re_enable_cfg9346_write(sc);
 
     switch (sc->re_type) {
@@ -3651,19 +3653,14 @@ void re_hw_start_unlock(struct re_softc* sc)
                 CSR_WRITE_1(sc, RE_CFG4, CSR_READ_1(sc, RE_CFG4) | (1 << 1)); //Jumbo_en1
 
                 re_set_offset79(sc, 0x20);
-#if DISABLED_CODE
                 ifp->if_capenable &= ~IFCAP_HWCSUM;
-#endif
                 CSR_WRITE_2(sc, RE_CPlusCmd, CSR_READ_2(sc, RE_CPlusCmd) & ~RL_RxChkSum);
-#if DISABLED_CODE
                 ifp->if_hwassist &= ~RE_CSUM_FEATURES;
-#endif
             }
             else {
                 CSR_WRITE_1(sc, RE_CFG3, CSR_READ_1(sc, RE_CFG3) & ~BIT_2); //Jumbo_en0
                 CSR_WRITE_1(sc, RE_CFG4, CSR_READ_1(sc, RE_CFG4) & ~(1 << 1)); //Jumbo_en1
                 re_set_offset79(sc, 0x40);
-#if DISABLED_CODE
                 if (sc->re_tx_cstag) {
                     ifp->if_capenable |= IFCAP_TXCSUM;
                     if ((sc->re_type == MACFG_24) || (sc->re_type == MACFG_25) || (sc->re_type == MACFG_26))
@@ -3675,7 +3672,6 @@ void re_hw_start_unlock(struct re_softc* sc)
                     ifp->if_capenable |= IFCAP_RXCSUM;
                     CSR_WRITE_2(sc, RE_CPlusCmd, CSR_READ_2(sc, RE_CPlusCmd) | RL_RxChkSum);
                 }
-#endif
             }
         }
         else if (sc->re_type == MACFG_25) {
@@ -3691,19 +3687,14 @@ void re_hw_start_unlock(struct re_softc* sc)
                 CSR_WRITE_1(sc, RE_CFG4, CSR_READ_1(sc, RE_CFG4) | (1 << 1)); //Jumbo_en1
 
                 re_set_offset79(sc, 0x20);
-#if DISABLED_CODE
                 ifp->if_capenable &= ~IFCAP_HWCSUM;
-#endif
                 CSR_WRITE_2(sc, RE_CPlusCmd, CSR_READ_2(sc, RE_CPlusCmd) & ~RL_RxChkSum);
-#if DISABLED_CODE
                 ifp->if_hwassist &= ~RE_CSUM_FEATURES;
-#endif
             }
             else {
                 CSR_WRITE_1(sc, RE_CFG3, CSR_READ_1(sc, RE_CFG3) & ~BIT_2); //Jumbo_en0
                 CSR_WRITE_1(sc, RE_CFG4, CSR_READ_1(sc, RE_CFG4) & ~(1 << 1)); //Jumbo_en1
                 re_set_offset79(sc, 0x40);
-#if DISABLED_CODE
                 if (sc->re_tx_cstag) {
                     ifp->if_capenable |= IFCAP_TXCSUM;
                     if ((sc->re_type == MACFG_24) || (sc->re_type == MACFG_25) || (sc->re_type == MACFG_26))
@@ -3715,7 +3706,6 @@ void re_hw_start_unlock(struct re_softc* sc)
                     ifp->if_capenable |= IFCAP_RXCSUM;
                     CSR_WRITE_2(sc, RE_CPlusCmd, CSR_READ_2(sc, RE_CPlusCmd) | RL_RxChkSum);
                 }
-#endif
             }
         }
         else if (sc->re_type == MACFG_26) {
@@ -3724,19 +3714,14 @@ void re_hw_start_unlock(struct re_softc* sc)
                 CSR_WRITE_1(sc, RE_CFG4, CSR_READ_1(sc, RE_CFG4) | (1 << 1)); //Jumbo_en1
 
                 re_set_offset79(sc, 0x20);
-#if DISABLED_CODE
                 ifp->if_capenable &= ~IFCAP_HWCSUM;
-#endif
                 CSR_WRITE_2(sc, RE_CPlusCmd, CSR_READ_2(sc, RE_CPlusCmd) & ~RL_RxChkSum);
-#if DISABLED_CODE
                 ifp->if_hwassist &= ~RE_CSUM_FEATURES;
-#endif
             }
             else {
                 CSR_WRITE_1(sc, RE_CFG3, CSR_READ_1(sc, RE_CFG3) & ~BIT_2); //Jumbo_en0
                 CSR_WRITE_1(sc, RE_CFG4, CSR_READ_1(sc, RE_CFG4) & ~(1 << 1)); //Jumbo_en1
                 re_set_offset79(sc, 0x40);
-#if DISABLED_CODE
                 if (sc->re_tx_cstag) {
                     ifp->if_capenable |= IFCAP_TXCSUM;
                     if ((sc->re_type == MACFG_24) || (sc->re_type == MACFG_25) || (sc->re_type == MACFG_26))
@@ -3748,7 +3733,6 @@ void re_hw_start_unlock(struct re_softc* sc)
                     ifp->if_capenable |= IFCAP_RXCSUM;
                     CSR_WRITE_2(sc, RE_CPlusCmd, CSR_READ_2(sc, RE_CPlusCmd) | RL_RxChkSum);
                 }
-#endif
             }
         }
     }
@@ -3771,19 +3755,14 @@ void re_hw_start_unlock(struct re_softc* sc)
             CSR_WRITE_1(sc, RE_CFG4, CSR_READ_1(sc, RE_CFG4) | (1 << 1)); //Jumbo_en1
 
             re_set_offset79(sc, 0x20);
-#if DISABLED_CODE
             ifp->if_capenable &= ~IFCAP_HWCSUM;
-#endif
             CSR_WRITE_2(sc, RE_CPlusCmd, CSR_READ_2(sc, RE_CPlusCmd) & ~RL_RxChkSum);
-#if DISABLED_CODE
             ifp->if_hwassist &= ~RE_CSUM_FEATURES;
-#endif
         }
         else {
             CSR_WRITE_1(sc, RE_CFG3, CSR_READ_1(sc, RE_CFG3) & ~BIT_2); //Jumbo_en0
             CSR_WRITE_1(sc, RE_CFG4, CSR_READ_1(sc, RE_CFG4) & ~(1 << 1)); //Jumbo_en1
             re_set_offset79(sc, 0x40);
-#if DISABLED_CODE
             if (sc->re_tx_cstag) {
                 ifp->if_capenable |= IFCAP_TXCSUM;
                 ifp->if_hwassist |= RE_CSUM_FEATURES;
@@ -3792,7 +3771,6 @@ void re_hw_start_unlock(struct re_softc* sc)
                 ifp->if_capenable |= IFCAP_RXCSUM;
                 CSR_WRITE_2(sc, RE_CPlusCmd, CSR_READ_2(sc, RE_CPlusCmd) | RL_RxChkSum);
             }
-#endif
         }
     }
     else if (macver == 0x28000000) {
@@ -3816,19 +3794,14 @@ void re_hw_start_unlock(struct re_softc* sc)
             CSR_WRITE_1(sc, RE_CFG4, CSR_READ_1(sc, RE_CFG4) | (1 << 1)); //Jumbo_en1
 
             re_set_offset79(sc, 0x20);
-#if DISABLED_CODE
             ifp->if_capenable &= ~IFCAP_HWCSUM;
-#endif
             CSR_WRITE_2(sc, RE_CPlusCmd, CSR_READ_2(sc, RE_CPlusCmd) & ~RL_RxChkSum);
-#if DISABLED_CODE
             ifp->if_hwassist &= ~RE_CSUM_FEATURES;
-#endif
         }
         else {
             CSR_WRITE_1(sc, RE_CFG3, CSR_READ_1(sc, RE_CFG3) & ~BIT_2); //Jumbo_en0
             CSR_WRITE_1(sc, RE_CFG4, CSR_READ_1(sc, RE_CFG4) & ~(1 << 1)); //Jumbo_en1
             re_set_offset79(sc, 0x40);
-#if DISABLED_CODE
             if (sc->re_tx_cstag) {
                 ifp->if_capenable |= IFCAP_TXCSUM;
                 ifp->if_hwassist |= RE_CSUM_FEATURES;
@@ -3837,7 +3810,6 @@ void re_hw_start_unlock(struct re_softc* sc)
                 ifp->if_capenable |= IFCAP_RXCSUM;
                 CSR_WRITE_2(sc, RE_CPlusCmd, CSR_READ_2(sc, RE_CPlusCmd) | RL_RxChkSum);
             }
-#endif
         }
 
         if (sc->re_type == MACFG_31) {
@@ -3894,19 +3866,14 @@ void re_hw_start_unlock(struct re_softc* sc)
             CSR_WRITE_1(sc, RE_CFG4, CSR_READ_1(sc, RE_CFG4) | (1 << 1)); //Jumbo_en1
 
             re_set_offset79(sc, 0x20);
-#if DISABLED_CODE
             ifp->if_capenable &= ~IFCAP_HWCSUM;
-#endif
             CSR_WRITE_2(sc, RE_CPlusCmd, CSR_READ_2(sc, RE_CPlusCmd) & ~RL_RxChkSum);
-#if DISABLED_CODE
             ifp->if_hwassist &= ~RE_CSUM_FEATURES;
-#endif
         }
         else {
             CSR_WRITE_1(sc, RE_CFG3, CSR_READ_1(sc, RE_CFG3) & ~BIT_2); //Jumbo_en0
             CSR_WRITE_1(sc, RE_CFG4, CSR_READ_1(sc, RE_CFG4) & ~(1 << 1)); //Jumbo_en1
             re_set_offset79(sc, 0x40);
-#if DISABLED_CODE
             if (sc->re_tx_cstag) {
                 ifp->if_capenable |= IFCAP_TXCSUM;
                 ifp->if_hwassist |= RE_CSUM_FEATURES;
@@ -3915,7 +3882,6 @@ void re_hw_start_unlock(struct re_softc* sc)
                 ifp->if_capenable |= IFCAP_RXCSUM;
                 CSR_WRITE_2(sc, RE_CPlusCmd, CSR_READ_2(sc, RE_CPlusCmd) | RL_RxChkSum);
             }
-#endif
         }
 
         if (sc->re_type == MACFG_65 || sc->re_type == MACFG_66) {
@@ -4010,13 +3976,9 @@ void re_hw_start_unlock(struct re_softc* sc)
                 CSR_WRITE_1(sc, RE_CFG3, CSR_READ_1(sc, RE_CFG3) | BIT_2);
                 CSR_WRITE_1(sc, RE_CFG4, CSR_READ_1(sc, RE_CFG4) | 0x01);
                 re_set_offset79(sc, 0x20);
-#if DISABLED_CODE
                 ifp->if_capenable &= ~IFCAP_HWCSUM;
-#endif
                 CSR_WRITE_2(sc, RE_CPlusCmd, CSR_READ_2(sc, RE_CPlusCmd) & ~RL_RxChkSum);
-#if DISABLED_CODE
                 ifp->if_hwassist &= ~RE_CSUM_FEATURES;
-#endif
             }
             else {
                 CSR_WRITE_1(sc, RE_MTPS, 0x0c);
@@ -4024,7 +3986,6 @@ void re_hw_start_unlock(struct re_softc* sc)
                 CSR_WRITE_1(sc, RE_CFG4, CSR_READ_1(sc, RE_CFG4) & ~0x01);
                 re_set_offset79(sc, 0x40);
 
-#if DISABLED_CODE
                 if (sc->re_tx_cstag) {
                     ifp->if_capenable |= IFCAP_TXCSUM;
                     ifp->if_hwassist |= RE_CSUM_FEATURES;
@@ -4033,7 +3994,6 @@ void re_hw_start_unlock(struct re_softc* sc)
                     ifp->if_capenable |= IFCAP_RXCSUM;
                     CSR_WRITE_2(sc, RE_CPlusCmd, CSR_READ_2(sc, RE_CPlusCmd) | RL_RxChkSum);
                 }
-#endif
             }
         }
     }
@@ -4113,10 +4073,8 @@ void re_hw_start_unlock(struct re_softc* sc)
 
         if (sc->mtu > ETHERMTU)
             CSR_WRITE_1(sc, RE_MTPS, 0x27);
-#if DISABLED_CODE
         ifp->if_capenable &= ~IFCAP_HWCSUM;
         ifp->if_hwassist &= ~RE_CSUM_FEATURES;
-#endif
     }
     else if (macver == 0x24000000) {
         if (pci_read_config(sc->dev, 0x81, 1) == 1) {
@@ -4262,7 +4220,6 @@ void re_hw_start_unlock(struct re_softc* sc)
         if (sc->mtu > ETHERMTU)
             CSR_WRITE_1(sc, RE_MTPS, 0x27);
 
-#if DISABLED_CODE
         if (sc->mtu > ETHERMTU) {
             ifp->if_capenable &= ~IFCAP_HWCSUM;
             ifp->if_hwassist &= ~RE_CSUM_FEATURES;
@@ -4276,7 +4233,6 @@ void re_hw_start_unlock(struct re_softc* sc)
                 ifp->if_capenable |= IFCAP_RXCSUM;
             }
         }
-#endif
     }
     else if (macver == 0x48800000) {
         /*set configuration space offset 0x70f to 0x27*/
@@ -4342,7 +4298,6 @@ void re_hw_start_unlock(struct re_softc* sc)
 
         if (sc->mtu > ETHERMTU)
             CSR_WRITE_1(sc, RE_MTPS, 0x27);
-#if DISABLED_CODE
         if (sc->mtu > ETHERMTU) {
             ifp->if_capenable &= ~IFCAP_HWCSUM;
             ifp->if_hwassist &= ~RE_CSUM_FEATURES;
@@ -4356,7 +4311,6 @@ void re_hw_start_unlock(struct re_softc* sc)
                 ifp->if_capenable |= IFCAP_RXCSUM;
             }
         }
-#endif
     }
     else if (macver == 0x44800000) {
         CSR_WRITE_1(sc, 0xF2, CSR_READ_1(sc, 0xF2) | 0x80);
@@ -4617,7 +4571,6 @@ void re_hw_start_unlock(struct re_softc* sc)
             MP_WriteMcuAccessRegWord(sc, 0xC142, 0xFFFF);
         }
 
-#if DISABLED_CODE
         if (sc->mtu > ETHERMTU) {
             ifp->if_capenable &= ~IFCAP_HWCSUM;
             ifp->if_hwassist &= ~RE_CSUM_FEATURES;
@@ -4631,7 +4584,6 @@ void re_hw_start_unlock(struct re_softc* sc)
                 ifp->if_capenable |= IFCAP_RXCSUM;
             }
         }
-#endif
     }
     else if (macver == 0x50000000) {
         /*set configuration space offset 0x70f to 0x17*/
@@ -4729,7 +4681,6 @@ void re_hw_start_unlock(struct re_softc* sc)
         MP_WriteMcuAccessRegWord(sc, 0xC140, 0xFFFF);
         MP_WriteMcuAccessRegWord(sc, 0xC142, 0xFFFF);
 
-#if DISABLED_CODE
         if (sc->mtu > ETHERMTU) {
             ifp->if_capenable &= ~IFCAP_HWCSUM;
             ifp->if_hwassist &= ~RE_CSUM_FEATURES;
@@ -4743,7 +4694,6 @@ void re_hw_start_unlock(struct re_softc* sc)
                 ifp->if_capenable |= IFCAP_RXCSUM;
             }
         }
-#endif
     }
     else if (macver == 0x54800000) {
         MP_WriteMcuAccessRegWord(sc, 0xE098, 0xC302);
@@ -4883,7 +4833,6 @@ void re_hw_start_unlock(struct re_softc* sc)
         MP_WriteMcuAccessRegWord(sc, 0xC140, 0xFFFF);
         MP_WriteMcuAccessRegWord(sc, 0xC142, 0xFFFF);
 
-#if DISABLED_CODE
         if (sc->mtu > ETHERMTU) {
             ifp->if_capenable &= ~IFCAP_HWCSUM;
             ifp->if_hwassist &= ~RE_CSUM_FEATURES;
@@ -4897,13 +4846,10 @@ void re_hw_start_unlock(struct re_softc* sc)
                 ifp->if_capenable |= IFCAP_RXCSUM;
             }
         }
-#endif
     }
-#if DISABLED_CODE
     if (!((sc->re_if_flags & RL_FLAG_DESCV2) &&
         (sc->re_if_flags & RL_FLAG_8168G_PLUS)))
         ifp->if_hwassist &= ~(CSUM_TCP_IPV6 | CSUM_UDP_IPV6);
-#endif
 
     //clear io_rdy_l23
     switch (sc->re_type) {
@@ -4975,7 +4921,6 @@ void re_hw_start_unlock(struct re_softc* sc)
 #endif
 
     data16 = CSR_READ_2(sc, RE_CPlusCmd);
-#if DISABLED_CODE
     if ((ifp->if_capenable & IFCAP_VLAN_HWTAGGING) != 0)
         data16 |= RL_CPLUSCMD_VLANSTRIP;
     else
@@ -4985,9 +4930,6 @@ void re_hw_start_unlock(struct re_softc* sc)
         data16 |= RL_RxChkSum;
     else
         data16 &= ~RL_RxChkSum;
-#else
-    data16 &= ~(RL_CPLUSCMD_VLANSTRIP | RL_RxChkSum);
-#endif
     CSR_WRITE_2(sc, RE_CPlusCmd, data16);
 
     re_disable_cfg9346_write(sc);
@@ -5312,15 +5254,13 @@ void re_hw_start_unlock_8125(struct re_softc* sc)
             CSR_WRITE_2(sc, RE_INT_CFG1_8125, 0x0000);
         }
 
-#if DISABLED_CODE
         if (sc->re_tx_cstag) {
-            ifp->if_capenable |= IFCAP_TXCSUM;
-            ifp->if_hwassist |= RE_CSUM_FEATURES;
+            sc->if_capenable |= IFCAP_TXCSUM;
+            sc->if_hwassist |= RE_CSUM_FEATURES;
         }
         if (sc->re_rx_cstag) {
-            ifp->if_capenable |= IFCAP_RXCSUM;
+            sc->if_capenable |= IFCAP_RXCSUM;
         }
-#endif
     }
 
     //clear io_rdy_l23
@@ -5337,24 +5277,16 @@ void re_hw_start_unlock_8125(struct re_softc* sc)
     //Interrupt Mitigation
     CSR_WRITE_4(sc, 0x0A00, 0x00630063);
 
-#if DISABLED_CODE
-    if ((ifp->if_capenable & IFCAP_VLAN_HWTAGGING) != 0)
+    if ((sc->if_capenable & IFCAP_VLAN_HWTAGGING) != 0)
         CSR_WRITE_4(sc, RE_RXCFG, CSR_READ_4(sc, RE_RXCFG) | (BIT_22 | BIT_23));
     else
         CSR_WRITE_4(sc, RE_RXCFG, CSR_READ_4(sc, RE_RXCFG) & ~(BIT_22 | BIT_23));
-#else
-    CSR_WRITE_4(sc, RE_RXCFG, CSR_READ_4(sc, RE_RXCFG) & ~(BIT_22 | BIT_23));
-#endif
 
     data16 = CSR_READ_2(sc, RE_CPlusCmd);
-#if DISABLED_CODE
-    if ((ifp->if_capenable & IFCAP_RXCSUM) != 0)
+    if ((sc->if_capenable & IFCAP_RXCSUM) != 0)
         data16 |= RL_RxChkSum;
     else
         data16 &= ~RL_RxChkSum;
-#else
-    data16 &= ~RL_RxChkSum;
-#endif
     CSR_WRITE_2(sc, RE_CPlusCmd, data16);
 
     re_disable_cfg9346_write(sc);

@@ -12,6 +12,11 @@
 #define phy_mdix_mode RE_ETH_PHY_AUTO_MDI_MDIX
 #define max_rx_mbuf_sz  MJUM9BYTES
 
+#define RE_CSUM_FEATURES_IPV4    (CSUM_IP | CSUM_TCP | CSUM_UDP)
+#define RE_CSUM_FEATURES_IPV6    (CSUM_TCP_IPV6 | CSUM_UDP_IPV6)
+#define RE_CSUM_FEATURES    (RE_CSUM_FEATURES_IPV4 | RE_CSUM_FEATURES_IPV6)
+
+
 // BSD Compat
 
 #define	MJUM9BYTES	(9 * 1024)	/* jumbo cluster 9k */
@@ -88,6 +93,8 @@
 
 #include "mii.h"
 #include "ethernet.h"
+#include "if.h"
+#include "mbuf.h"
 
 NTSYSAPI extern "C" ULONG RtlRandomEx(
     _Inout_ PULONG Seed

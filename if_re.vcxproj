@@ -203,9 +203,11 @@
     <ClInclude Include="device.h" />
     <ClInclude Include="ethernet.h" />
     <ClInclude Include="forward.h" />
+    <ClInclude Include="if.h" />
     <ClInclude Include="if_re_bsd.h" />
     <ClInclude Include="interrupt.h" />
     <ClInclude Include="link.h" />
+    <ClInclude Include="mbuf.h" />
     <ClInclude Include="mii.h" />
     <ClInclude Include="netringiterator.h" />
     <ClInclude Include="power.h" />
