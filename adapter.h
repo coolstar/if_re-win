@@ -7,6 +7,11 @@
 #define RT_MAX_RX_QUEUES (4)
 #define RT_MAX_QUEUES RT_MAX_RX_QUEUES
 
+#define RT_GSO_OFFLOAD_MAX_SIZE 64000
+#define RT_GSO_OFFLOAD_MIN_SEGMENT_COUNT 2
+#define RT_GSO_OFFLOAD_LAYER_4_HEADER_OFFSET_LIMIT 127
+#define RT_CHECKSUM_OFFLOAD_LAYER_4_HEADER_OFFSET_LIMIT 1023
+
 typedef enum REG_SPEED_SETTING {
     RtSpeedDuplexModeAutoNegotiation = 0,
     RtSpeedDuplexMode10MHalfDuplex = 1,
@@ -58,6 +63,10 @@ typedef struct _RT_ADAPTER
 
     BOOLEAN isRTL8125;
     ULONG64 MaxSpeed;
+
+    BOOLEAN TxIpHwChkSum;
+    BOOLEAN TxTcpHwChkSum;
+    BOOLEAN TxUdpHwChkSum;
 
     struct re_softc bsdData;
 } RT_ADAPTER, * PRT_ADAPTER;

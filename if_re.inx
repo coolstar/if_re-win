@@ -75,6 +75,7 @@ AddReg                  = ndi.reg
 AddReg                  = Speed.kw
 AddReg                  = NetworkAddress.kw
 AddReg                  = FlowControl.kw
+AddReg                  = OffloadChecksum.kw
 
 [ndi.reg]
 ; TODO: Update these if your device is not Ethernet.
@@ -150,6 +151,47 @@ HKR,Ndi\params\*FlowControl\enum,               "1",            0,  %TxEnabled%
 HKR,Ndi\params\*FlowControl\enum,               "2",            0,  %RxEnabled%
 HKR,Ndi\params\*FlowControl\enum,               "3",            0,  %RxTxEnabled%
 
+[OffloadChecksum.kw]
+HKR,Ndi\params\*IPChecksumOffloadIPv4,          ParamDesc,      0,  %IPChksumOffv4%
+HKR,Ndi\params\*IPChecksumOffloadIPv4,          default,        0,  "3"
+HKR,Ndi\params\*IPChecksumOffloadIPv4,          type,           0,  "enum"
+HKR,Ndi\params\*IPChecksumOffloadIPv4\enum,     "0",            0,  %Disabled%
+HKR,Ndi\params\*IPChecksumOffloadIPv4\enum,     "1",            0,  %TxEnabled%
+HKR,Ndi\params\*IPChecksumOffloadIPv4\enum,     "2",            0,  %RxEnabled%
+HKR,Ndi\params\*IPChecksumOffloadIPv4\enum,     "3",            0,  %RxTxEnabled%
+
+HKR,Ndi\params\*TCPChecksumOffloadIPv4,         ParamDesc,      0,  %TCPChksumOffv4%
+HKR,Ndi\params\*TCPChecksumOffloadIPv4,         default,        0,  "3"
+HKR,Ndi\params\*TCPChecksumOffloadIPv4,         type,           0,  "enum"
+HKR,Ndi\params\*TCPChecksumOffloadIPv4\enum,    "0",            0,  %Disabled%
+HKR,Ndi\params\*TCPChecksumOffloadIPv4\enum,    "1",            0,  %TxEnabled%
+HKR,Ndi\params\*TCPChecksumOffloadIPv4\enum,    "2",            0,  %RxEnabled%
+HKR,Ndi\params\*TCPChecksumOffloadIPv4\enum,    "3",            0,  %RxTxEnabled%
+
+HKR,Ndi\params\*UDPChecksumOffloadIPv4,         ParamDesc,      0,  %UDPChksumOffv4%
+HKR,Ndi\params\*UDPChecksumOffloadIPv4,         default,        0,  "3"
+HKR,Ndi\params\*UDPChecksumOffloadIPv4,         type,           0,  "enum"
+HKR,Ndi\params\*UDPChecksumOffloadIPv4\enum,    "0",            0,  %Disabled%
+HKR,Ndi\params\*UDPChecksumOffloadIPv4\enum,    "1",            0,  %TxEnabled%
+HKR,Ndi\params\*UDPChecksumOffloadIPv4\enum,    "2",            0,  %RxEnabled%
+HKR,Ndi\params\*UDPChecksumOffloadIPv4\enum,    "3",            0,  %RxTxEnabled%
+
+HKR,Ndi\params\*TCPChecksumOffloadIPv6,         ParamDesc,      0,  %TCPChksumOffv6%
+HKR,Ndi\params\*TCPChecksumOffloadIPv6,         default,        0,  "3"
+HKR,Ndi\params\*TCPChecksumOffloadIPv6,         type,           0,  "enum"
+HKR,Ndi\params\*TCPChecksumOffloadIPv6\enum,    "0",            0,  %Disabled%
+HKR,Ndi\params\*TCPChecksumOffloadIPv6\enum,    "1",            0,  %TxEnabled%
+HKR,Ndi\params\*TCPChecksumOffloadIPv6\enum,    "2",            0,  %RxEnabled%
+HKR,Ndi\params\*TCPChecksumOffloadIPv6\enum,    "3",            0,  %RxTxEnabled%
+
+HKR,Ndi\params\*UDPChecksumOffloadIPv6,         ParamDesc,      0,  %UDPChksumOffv6%
+HKR,Ndi\params\*UDPChecksumOffloadIPv6,         default,        0,  "3"
+HKR,Ndi\params\*UDPChecksumOffloadIPv6,         type,           0,  "enum"
+HKR,Ndi\params\*UDPChecksumOffloadIPv6\enum,    "0",            0,  %Disabled%
+HKR,Ndi\params\*UDPChecksumOffloadIPv6\enum,    "1",            0,  %TxEnabled%
+HKR,Ndi\params\*UDPChecksumOffloadIPv6\enum,    "2",            0,  %RxEnabled%
+HKR,Ndi\params\*UDPChecksumOffloadIPv6\enum,    "3",            0,  %RxTxEnabled%
+
 [Strings]
 AutoDetect               = "Auto Negotiation"
 SpeedDuplex              = "Speed & Duplex"
@@ -160,6 +202,11 @@ SpeedDuplex              = "Speed & Duplex"
 1000Mb-Half-Duplex       = "1.0 Gbps Half Duplex"
 1000Mb-Full-Duplex       = "1.0 Gbps Full Duplex"
 NetworkAddress           = "Network Address"
+IPChksumOffv4            = "IPv4 Checksum Offload"
+TCPChksumOffv4           = "TCP Checksum Offload (IPv4)"
+UDPChksumOffv4           = "UDP Checksum Offload (IPv4)"
+TCPChksumOffv6           = "TCP Checksum Offload (IPv6)"
+UDPChksumOffv6           = "UDP Checksum Offload (IPv6)"
 Disabled                 = "Disabled"
 TxEnabled                = "Tx Enabled"
 RxEnabled                = "Rx Enabled"

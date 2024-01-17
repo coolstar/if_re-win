@@ -167,6 +167,57 @@ RtAdapterSetDatapathCapabilities(
     NetAdapterSetDataPathCapabilities(adapter->NetAdapter, &txCapabilities, &rxCapabilities);
 }
 
+static
+void
+EvtAdapterOffloadSetTxChecksum(
+    _In_ NETADAPTER netAdapter,
+    _In_ NETOFFLOAD offload
+)
+{
+    RT_ADAPTER* adapter = RtGetAdapterContext(netAdapter);
+
+    adapter->TxIpHwChkSum = NetOffloadIsTxChecksumIPv4Enabled(offload);
+    adapter->TxTcpHwChkSum = NetOffloadIsTxChecksumTcpEnabled(offload);
+    adapter->TxUdpHwChkSum = NetOffloadIsTxChecksumUdpEnabled(offload);
+}
+
+static
+void
+RtAdapterSetOffloadCapabilities(
+    _In_ RT_ADAPTER const* adapter
+)
+{
+    NET_ADAPTER_OFFLOAD_TX_CHECKSUM_CAPABILITIES txChecksumOffloadCapabilities;
+
+    const struct re_softc* sc = &adapter->bsdData;
+
+    BOOLEAN checksumSupported = (sc->if_hwassist & RE_CSUM_FEATURES) != 0;
+    DbgPrint("Checksum Supported? %d 0x%x\n", checksumSupported, sc->if_hwassist);
+
+    if (!checksumSupported) {
+        return;
+    }
+
+    auto const layer3Flags = NetAdapterOffloadLayer3FlagIPv4NoOptions |
+        NetAdapterOffloadLayer3FlagIPv4WithOptions |
+        NetAdapterOffloadLayer3FlagIPv6NoExtensions |
+        NetAdapterOffloadLayer3FlagIPv6WithExtensions;
+
+    auto const layer4Flags = NetAdapterOffloadLayer4FlagTcpNoOptions |
+        NetAdapterOffloadLayer4FlagTcpWithOptions |
+        NetAdapterOffloadLayer4FlagUdp;
+
+    NET_ADAPTER_OFFLOAD_TX_CHECKSUM_CAPABILITIES_INIT(
+        &txChecksumOffloadCapabilities,
+        layer3Flags,
+        EvtAdapterOffloadSetTxChecksum);
+
+    txChecksumOffloadCapabilities.Layer4Flags = layer4Flags;
+    txChecksumOffloadCapabilities.Layer4HeaderOffsetLimit = RT_CHECKSUM_OFFLOAD_LAYER_4_HEADER_OFFSET_LIMIT;
+
+    NetAdapterOffloadSetTxChecksumCapabilities(adapter->NetAdapter, &txChecksumOffloadCapabilities);
+}
+
 _Use_decl_annotations_
 NTSTATUS
 RtAdapterStart(
@@ -182,6 +233,8 @@ RtAdapterStart(
     RtAdapterSetReceiveFilterCapabilities(adapter);
 
     RtAdapterSetDatapathCapabilities(adapter);
+
+    RtAdapterSetOffloadCapabilities(adapter);
 
     GOTO_IF_NOT_NT_SUCCESS(
         Exit, status,

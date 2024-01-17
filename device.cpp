@@ -165,6 +165,9 @@ RtInitializeHardware(
         sc->if_capenable &= ~(IFCAP_TSO6 | IFCAP_HWCSUM_IPV6);
     }
 
+    adapter->bsdData.re_rx_cstag = 1;
+    adapter->bsdData.re_tx_cstag = 1;
+
     GOTO_IF_NOT_NT_SUCCESS(Exit, status,
         RtRegisterScatterGatherDma(adapter),
         TraceLoggingRtAdapter(adapter));

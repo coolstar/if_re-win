@@ -166,6 +166,111 @@ GetTcbFromPacket(
 
 static
 void
+RtProgramOffloadDescriptor(
+    _In_ RT_TXQUEUE const* tx,
+    _In_ NET_PACKET const* packet,
+    _In_ TxDesc* txd,
+    _In_ UINT32 packetIndex
+)
+{
+    RT_ADAPTER const* adapter = tx->Adapter;
+    const struct re_softc* sc = &adapter->bsdData;
+
+#define opts1 txd->ul[0]
+#define opts2 txd->ul[1]
+
+    BOOLEAN checksumEnabled = tx->ChecksumExtension.Enabled &&
+        (adapter->TxTcpHwChkSum || adapter->TxIpHwChkSum || adapter->TxUdpHwChkSum);
+
+    DbgPrint("Checksum Enabled? %d\n", checksumEnabled);
+
+    if (checksumEnabled) {
+        NET_PACKET_CHECKSUM* checksumInfo =
+            NetExtensionGetPacketChecksum(&tx->ChecksumExtension, packetIndex);
+
+        DbgPrint("IPv4? %d, IPv6? %d\n", NetPacketIsIpv4(packet), NetPacketIsIpv6(packet));
+
+        if (NetPacketIsIpv4(packet)) {
+            // Prioritize layer4 checksum first
+            if (checksumInfo->Layer4 == NetPacketTxChecksumActionRequired)
+            {
+                const USHORT layer4HeaderOffset =
+                    packet->Layout.Layer2HeaderLength +
+                    packet->Layout.Layer3HeaderLength;
+
+                UNREFERENCED_PARAMETER(layer4HeaderOffset);
+
+                NT_ASSERT(packet->Layout.Layer2HeaderLength != 0U);
+                NT_ASSERT(packet->Layout.Layer3HeaderLength != 0U);
+                NT_ASSERT(layer4HeaderOffset < 0xff);
+
+                if (packet->Layout.Layer4Type == NetPacketLayer4TypeTcp)
+                {
+                    if ((sc->re_if_flags & RL_FLAG_DESCV2) == 0)
+                        opts1 |= (RL_TCPCS1 | RL_IPV4CS1);
+                    else
+                        opts2 |= (RL_TCPCS | RL_IPV4CS);
+                }
+
+                if (packet->Layout.Layer4Type == NetPacketLayer4TypeUdp)
+                {
+                    if ((sc->re_if_flags & RL_FLAG_DESCV2) == 0)
+                        opts1 |= (RL_UDPCS1 | RL_IPV4CS1);
+                    else
+                        opts2 |= (RL_UDPCS | RL_IPV4CS);
+                }
+            }
+
+            // If no layer4 checksum is required, then just do layer 3 checksum
+            if (checksumInfo->Layer3 == NetPacketTxChecksumActionRequired)
+            {
+                if ((sc->re_if_flags & RL_FLAG_DESCV2) == 0)
+                    opts1 |= RL_IPV4CS1;
+                else
+                    opts2 |= RL_IPV4CS;
+            }
+        }
+
+        if (NetPacketIsIpv6(packet)) {
+            if (checksumInfo->Layer4 == NetPacketTxChecksumActionRequired)
+            {
+                const USHORT layer4HeaderOffset =
+                    packet->Layout.Layer2HeaderLength +
+                    packet->Layout.Layer3HeaderLength;
+
+                NT_ASSERT(packet->Layout.Layer2HeaderLength != 0U);
+                NT_ASSERT(packet->Layout.Layer3HeaderLength != 0U);
+                NT_ASSERT(layer4HeaderOffset < 0xff);
+
+                if (packet->Layout.Layer4Type == NetPacketLayer4TypeTcp)
+                {
+                    if ((sc->re_if_flags & RL_FLAG_DESCV2) == 0) {
+                        opts1 |= RL_TCPCS1;
+                    }
+                    else {
+                        opts2 |= RL_TCPCS;
+                        opts2 |= RL_CS_V6F | (layer4HeaderOffset << RL_TDESC_CMD_CSUM_TCPHO_SHIFT);
+                    }
+                }
+
+                if (packet->Layout.Layer4Type == NetPacketLayer4TypeUdp)
+                {
+                    if ((sc->re_if_flags & RL_FLAG_DESCV2) == 0) {
+                        opts1 |= RL_UDPCS1;
+                    }
+                    else {
+                        opts2 |= RL_UDPCS;
+                        opts2 |= RL_CS_V6F | (layer4HeaderOffset << RL_TDESC_CMD_CSUM_TCPHO_SHIFT);
+                    }
+                }
+            }
+        }
+    }
+        
+}
+
+static
+void
 RtPostTxDescriptor(
     _In_ RT_TXQUEUE* tx,
     _In_ RT_TCB const* tcb,
@@ -205,7 +310,7 @@ RtPostTxDescriptor(
     }
 
     //TODO
-    //status |= RtProgramOffloadDescriptor(tx, packet, txd, packetIndex);
+    RtProgramOffloadDescriptor(tx, packet, txd, packetIndex);
 
     MemoryBarrier();
 
