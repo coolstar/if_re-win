@@ -136,7 +136,7 @@ RtInitializeHardware(
 
     adapter->bsdData.dev = adapter;
     adapter->bsdData.mtu = ETHERMTU;
-    adapter->bsdData.eee_enable = 0;
+    adapter->bsdData.eee_enable = 1;
 
     UINT16 devID = ConfigRead16(adapter, 2);
     adapter->bsdData.re_device_id = devID;
