@@ -77,6 +77,7 @@ AddReg                  = NetworkAddress.kw
 AddReg                  = FlowControl.kw
 AddReg                  = OffloadChecksum.kw
 AddReg                  = PriorityVlanTag.kw
+AddReg                  = LSO.kw
 
 [ndi.reg]
 ; TODO: Update these if your device is not Ethernet.
@@ -202,6 +203,19 @@ HKR,Ndi\Params\*PriorityVlanTag\enum,           "1",            0,  %PriorityEna
 HKR,Ndi\Params\*PriorityVlanTag\enum,           "2",            0,  %VLANEnabled%
 HKR,Ndi\Params\*PriorityVlanTag\enum,           "3",            0,  %PriorityVLANEnabled%
 
+[LSO.kw]
+HKR,Ndi\Params\*LsoV2Ipv4,                      ParamDesc,      0,  %LSOv2Ipv4%
+HKR,Ndi\Params\*LsoV2Ipv4,                      Type,           0,  "enum"
+HKR,Ndi\Params\*LsoV2Ipv4,                      Default,        0,  "1"
+HKR,Ndi\Params\*LsoV2Ipv4\enum,                 "0",            0,  %Disabled%
+HKR,Ndi\Params\*LsoV2Ipv4\enum,                 "1",            0,  %Enabled%
+
+HKR,Ndi\Params\*LsoV2Ipv6,                      ParamDesc,      0,  %LSOv2Ipv6%
+HKR,Ndi\Params\*LsoV2Ipv6,                      Type,           0,  "enum"
+HKR,Ndi\Params\*LsoV2Ipv6,                      Default,        0,  "1"
+HKR,Ndi\Params\*LsoV2Ipv6\enum,                 "0",            0,  %Disabled%
+HKR,Ndi\Params\*LsoV2Ipv6\enum,                 "1",            0,  %Enabled%
+
 [Strings]
 AutoDetect               = "Auto Negotiation"
 SpeedDuplex              = "Speed & Duplex"
@@ -217,6 +231,7 @@ TCPChksumOffv4           = "TCP Checksum Offload (IPv4)"
 UDPChksumOffv4           = "UDP Checksum Offload (IPv4)"
 TCPChksumOffv6           = "TCP Checksum Offload (IPv6)"
 UDPChksumOffv6           = "UDP Checksum Offload (IPv6)"
+Enabled                  = "Enabled"
 Disabled                 = "Disabled"
 TxEnabled                = "Tx Enabled"
 RxEnabled                = "Rx Enabled"
@@ -227,6 +242,9 @@ PriorityVLANDisabled     = "Priority & VLAN Disabled"
 PriorityVLANEnabled      = "Priority & VLAN Enabled"
 PriorityEnabled          = "Packet Priority Enabled"
 VLANEnabled              = "VLAN Enabled"
+
+LSOv2Ipv4                = "Large Send Offload v2 (IPv4)"
+LSOv2Ipv6                = "Large Send Offload v2 (IPv6)"
 
 SPSVCINST_ASSOCSERVICE= 0x00000002
 StdMfg                 = "Realtek"

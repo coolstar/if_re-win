@@ -179,10 +179,14 @@ RtProgramOffloadDescriptor(
 #define opts1 txd->ul[0]
 #define opts2 txd->ul[1]
 
+    bool lsoEnabled = tx->GsoExtension.Enabled &&
+        (adapter->LSOv4 || adapter->LSOv6);
+
     bool checksumEnabled = tx->ChecksumExtension.Enabled &&
         (adapter->TxTcpHwChkSum || adapter->TxIpHwChkSum || adapter->TxUdpHwChkSum);
 
     bool ieee8021qEnabled = tx->Ieee8021qExtension.Enabled;
+
     if (ieee8021qEnabled)
     {
         opts2 |= RL_TDESC_VLANCTL_TAG;
@@ -200,6 +204,31 @@ RtProgramOffloadDescriptor(
         }
 
         opts2 |= (tag8021q.Value & RL_TDESC_VLANCTL_DATA);
+    }
+
+    if (packet->Layout.Layer4Type == NetPacketLayer4TypeTcp && lsoEnabled)
+    {
+        UINT32 mss = NetExtensionGetPacketGso(&tx->GsoExtension, packetIndex)->TCP.Mss;
+        if (mss > 0) {
+            const USHORT layer4HeaderOffset =
+                packet->Layout.Layer2HeaderLength +
+                packet->Layout.Layer3HeaderLength;
+
+            NT_ASSERT(packet->Layout.Layer2HeaderLength != 0U);
+            NT_ASSERT(packet->Layout.Layer3HeaderLength != 0U);
+            NT_ASSERT(layer4HeaderOffset < 0xff);
+
+            if (NetPacketIsIpv4(packet))
+            {
+                opts1 |= RL_TDESC_CMD_GTSENDV4 | (layer4HeaderOffset << RL_TDESC_CMD_GTSEND_TCPHO_SHIFT);
+            }
+            else if (NetPacketIsIpv6(packet))
+            {
+                opts1 |= RL_TDESC_CMD_GTSENDV6 | (layer4HeaderOffset << RL_TDESC_CMD_GTSEND_TCPHO_SHIFT);
+            }
+
+            opts2 |= (mss << RL_TDESC_CMD_MSSVALV2_SHIFT);
+        }
     }
 
     if (checksumEnabled) {

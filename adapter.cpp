@@ -197,6 +197,19 @@ EvtAdapterOffloadSetRxChecksum(
 
 static
 void
+EvtAdapterOffloadSetGso(
+    _In_ NETADAPTER netAdapter,
+    _In_ NETOFFLOAD offload
+)
+{
+    RT_ADAPTER* adapter = RtGetAdapterContext(netAdapter);
+
+    adapter->LSOv4 = NetOffloadIsLsoIPv4Enabled(offload);
+    adapter->LSOv6 = NetOffloadIsLsoIPv6Enabled(offload);
+}
+
+static
+void
 RtAdapterSetOffloadCapabilities(
     _In_ RT_ADAPTER const* adapter
 )
@@ -236,6 +249,31 @@ RtAdapterSetOffloadCapabilities(
             EvtAdapterOffloadSetRxChecksum);
 
         NetAdapterOffloadSetRxChecksumCapabilities(adapter->NetAdapter, &rxChecksumOffloadCapabilities);
+    }
+
+    BOOLEAN gsoSupported = (sc->if_capenable & IFCAP_TSO) != 0;
+    if (gsoSupported) {
+        NET_ADAPTER_OFFLOAD_GSO_CAPABILITIES gsoOffloadCapabilities;
+
+        auto const layer3GsoFlags = NetAdapterOffloadLayer3FlagIPv4NoOptions |
+            NetAdapterOffloadLayer3FlagIPv4WithOptions |
+            NetAdapterOffloadLayer3FlagIPv6NoExtensions |
+            NetAdapterOffloadLayer3FlagIPv6WithExtensions;
+
+        auto const layer4GsoFlags = NetAdapterOffloadLayer4FlagTcpNoOptions |
+            NetAdapterOffloadLayer4FlagTcpWithOptions;
+
+        NET_ADAPTER_OFFLOAD_GSO_CAPABILITIES_INIT(
+            &gsoOffloadCapabilities,
+            layer3GsoFlags,
+            layer4GsoFlags,
+            RT_GSO_OFFLOAD_MAX_SIZE,
+            RT_GSO_OFFLOAD_MIN_SEGMENT_COUNT,
+            EvtAdapterOffloadSetGso);
+
+        gsoOffloadCapabilities.Layer4HeaderOffsetLimit = RT_GSO_OFFLOAD_LAYER_4_HEADER_OFFSET_LIMIT;
+
+        NetAdapterOffloadSetGsoCapabilities(adapter->NetAdapter, &gsoOffloadCapabilities);
     }
 
     BOOLEAN ieee8021qSupported = (sc->if_capenable & IFCAP_VLAN_HWTAGGING) != 0;
