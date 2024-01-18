@@ -255,12 +255,12 @@ RtAdapterSetOffloadCapabilities(
     if (gsoSupported) {
         NET_ADAPTER_OFFLOAD_GSO_CAPABILITIES gsoOffloadCapabilities;
 
-        auto const layer3GsoFlags = NetAdapterOffloadLayer3FlagIPv4NoOptions |
+        const NET_ADAPTER_OFFLOAD_LAYER3_FLAGS layer3GsoFlags = NetAdapterOffloadLayer3FlagIPv4NoOptions |
             NetAdapterOffloadLayer3FlagIPv4WithOptions |
             NetAdapterOffloadLayer3FlagIPv6NoExtensions |
             NetAdapterOffloadLayer3FlagIPv6WithExtensions;
 
-        auto const layer4GsoFlags = NetAdapterOffloadLayer4FlagTcpNoOptions |
+        const NET_ADAPTER_OFFLOAD_LAYER4_FLAGS layer4GsoFlags = NetAdapterOffloadLayer4FlagTcpNoOptions |
             NetAdapterOffloadLayer4FlagTcpWithOptions;
 
         NET_ADAPTER_OFFLOAD_GSO_CAPABILITIES_INIT(
