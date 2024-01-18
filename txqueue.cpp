@@ -284,30 +284,39 @@ RtPostTxDescriptor(
     NET_FRAGMENT_LOGICAL_ADDRESS const* logicalAddress = NetExtensionGetFragmentLogicalAddress(
         &tx->LogicalAddressExtension, index);
 
-    RtlZeroMemory(txd, sizeof(*txd));
+    TxDesc desc;
 
-    txd->so1.TxBuff = logicalAddress->LogicalAddress + fragment->Offset;
-    txd->so1.Frame_Length = (UINT16)fragment->ValidLength;
-    txd->so1.OWN = 1; //NIC Owns descriptor
+    RtlZeroMemory(txd, sizeof(*txd));
+    RtlZeroMemory(&desc, sizeof(desc));
+
+    desc.so1.TxBuff = logicalAddress->LogicalAddress + fragment->Offset;
+    desc.so1.Frame_Length = (UINT16)fragment->ValidLength;
+    desc.so1.OWN = 1; //NIC Owns descriptor
     //TODO: VLAN
 
     if (tcb->NumTxDesc == 0) {
-        txd->so1.FS = 1; //First Segment
+        desc.so1.FS = 1; //First Segment
     }
 
     if (tcb->NumTxDesc + 1 == packet->FragmentCount)
     {
-        txd->so1.LS = 1; // Last Segment
+        desc.so1.LS = 1; // Last Segment
     }
 
     if (tx->TxDescIndex == tx->NumTxDesc - 1)
     {
-        txd->so1.EOR = 1; // End of Ring
+        desc.so1.EOR = 1; // End of Ring
     }
 
     //TODO
-    RtProgramOffloadDescriptor(tx, packet, txd, packetIndex);
+    RtProgramOffloadDescriptor(tx, packet, &desc, packetIndex);
 
+    txd->ul[3] = desc.ul[3];
+    txd->ul[2] = desc.ul[2];
+    txd->ul[1] = desc.ul[1];
+    //Make sure opts2 is set first
+    MemoryBarrier();
+    txd->ul[0] = desc.ul[0];
     MemoryBarrier();
 
     tx->TxDescIndex = (tx->TxDescIndex + 1) % tx->NumTxDesc;
