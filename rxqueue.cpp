@@ -60,6 +60,14 @@ EvtAdapterCreateRxQueue(
 
     NET_EXTENSION_QUERY_INIT(
         &extension,
+        NET_PACKET_EXTENSION_IEEE8021Q_NAME,
+        NET_PACKET_EXTENSION_IEEE8021Q_VERSION_1,
+        NetExtensionTypePacket);
+
+    NetRxQueueGetExtension(rxQueue, &extension, &rx->Ieee8021qExtension);
+
+    NET_EXTENSION_QUERY_INIT(
+        &extension,
         NET_FRAGMENT_EXTENSION_LOGICAL_ADDRESS_NAME,
         NET_FRAGMENT_EXTENSION_LOGICAL_ADDRESS_VERSION_1,
         NetExtensionTypeFragment);
@@ -222,6 +230,18 @@ RxIndicateReceives(
         packet->FragmentIndex = fragmentIndex;
         packet->FragmentCount = 1;
 
+#define opts1 rxd->ul[0]
+#define opts2 rxd->ul[1]
+        if (rx->Ieee8021qExtension.Enabled)
+        {
+            NET_PACKET_IEEE8021Q* ieee8021q = NetExtensionGetPacketIeee8021Q(&rx->Ieee8021qExtension, packetIndex);
+            if (opts2 & RL_RDESC_VLANCTL_TAG) {
+                RT_TAG_802_1Q tag8021q = { 0 };
+                tag8021q.Value = (opts2 & RL_RDESC_VLANCTL_DATA);
+                ieee8021q->PriorityCodePoint = tag8021q.TagHeader.Priority;
+                ieee8021q->VlanIdentifier = (tag8021q.TagHeader.VLanID1 << 8) | tag8021q.TagHeader.VLanID2;
+            }
+        }
         
         if (rx->ChecksumExtension.Enabled)
         {

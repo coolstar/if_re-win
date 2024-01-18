@@ -76,6 +76,7 @@ AddReg                  = Speed.kw
 AddReg                  = NetworkAddress.kw
 AddReg                  = FlowControl.kw
 AddReg                  = OffloadChecksum.kw
+AddReg                  = PriorityVlanTag.kw
 
 [ndi.reg]
 ; TODO: Update these if your device is not Ethernet.
@@ -192,6 +193,15 @@ HKR,Ndi\params\*UDPChecksumOffloadIPv6\enum,    "1",            0,  %TxEnabled%
 HKR,Ndi\params\*UDPChecksumOffloadIPv6\enum,    "2",            0,  %RxEnabled%
 HKR,Ndi\params\*UDPChecksumOffloadIPv6\enum,    "3",            0,  %RxTxEnabled%
 
+[PriorityVlanTag.kw]
+HKR,Ndi\Params\*PriorityVlanTag,                ParamDesc,      0,  %PriorityVLAN%
+HKR,Ndi\Params\*PriorityVlanTag,                Default,        0,  "3"
+HKR,Ndi\Params\*PriorityVlanTag,                Type,           0,  "enum"
+HKR,Ndi\Params\*PriorityVlanTag\enum,           "0",            0,  %PriorityVLANDisabled%
+HKR,Ndi\Params\*PriorityVlanTag\enum,           "1",            0,  %PriorityEnabled%
+HKR,Ndi\Params\*PriorityVlanTag\enum,           "2",            0,  %VLANEnabled%
+HKR,Ndi\Params\*PriorityVlanTag\enum,           "3",            0,  %PriorityVLANEnabled%
+
 [Strings]
 AutoDetect               = "Auto Negotiation"
 SpeedDuplex              = "Speed & Duplex"
@@ -212,6 +222,11 @@ TxEnabled                = "Tx Enabled"
 RxEnabled                = "Rx Enabled"
 RxTxEnabled              = "Rx & Tx Enabled"
 FlowControl              = "Flow Control"
+PriorityVLAN             = "Priority & VLAN"
+PriorityVLANDisabled     = "Priority & VLAN Disabled"
+PriorityVLANEnabled      = "Priority & VLAN Enabled"
+PriorityEnabled          = "Packet Priority Enabled"
+VLANEnabled              = "VLAN Enabled"
 
 SPSVCINST_ASSOCSERVICE= 0x00000002
 StdMfg                 = "Realtek"

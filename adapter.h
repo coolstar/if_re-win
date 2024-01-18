@@ -31,6 +31,22 @@ typedef enum FLOW_CTRL {
     FlowControlTxRx = 3
 };
 
+typedef struct _RT_TAG_802_1Q
+{
+    union
+    {
+        struct
+        {
+            USHORT VLanID1 : 4;
+            USHORT CFI : 1;
+            USHORT Priority : 3;
+            USHORT VLanID2 : 8;
+        } TagHeader;
+
+        USHORT Value;
+    };
+} RT_TAG_802_1Q;
+
 typedef struct _RT_ADAPTER
 {
     // WDF handles associated with this context

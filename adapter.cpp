@@ -237,6 +237,20 @@ RtAdapterSetOffloadCapabilities(
 
         NetAdapterOffloadSetRxChecksumCapabilities(adapter->NetAdapter, &rxChecksumOffloadCapabilities);
     }
+
+    BOOLEAN ieee8021qSupported = (sc->if_capenable & IFCAP_VLAN_HWTAGGING) != 0;
+    if (ieee8021qSupported) {
+        const NET_ADAPTER_OFFLOAD_IEEE8021Q_TAG_FLAGS ieee8021qTaggingFlag = NetAdapterOffloadIeee8021PriorityTaggingFlag |
+            NetAdapterOffloadIeee8021VlanTaggingFlag;
+
+        NET_ADAPTER_OFFLOAD_IEEE8021Q_TAG_CAPABILITIES ieee8021qTagOffloadCapabilities;
+
+        NET_ADAPTER_OFFLOAD_IEEE8021Q_TAG_CAPABILITIES_INIT(
+            &ieee8021qTagOffloadCapabilities,
+            ieee8021qTaggingFlag);
+
+        NetAdapterOffloadSetIeee8021qTagCapabilities(adapter->NetAdapter, &ieee8021qTagOffloadCapabilities);
+    }
 }
 
 _Use_decl_annotations_

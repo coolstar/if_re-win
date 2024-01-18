@@ -182,6 +182,26 @@ RtProgramOffloadDescriptor(
     bool checksumEnabled = tx->ChecksumExtension.Enabled &&
         (adapter->TxTcpHwChkSum || adapter->TxIpHwChkSum || adapter->TxUdpHwChkSum);
 
+    bool ieee8021qEnabled = tx->Ieee8021qExtension.Enabled;
+    if (ieee8021qEnabled)
+    {
+        opts2 |= RL_TDESC_VLANCTL_TAG;
+        RT_TAG_802_1Q tag8021q = { 0 };
+
+        NET_PACKET_IEEE8021Q* ieee8021q = NetExtensionGetPacketIeee8021Q(&tx->Ieee8021qExtension, packetIndex);
+        if (ieee8021q->TxTagging & NetPacketTxIeee8021qActionFlagPriorityRequired) {
+            tag8021q.TagHeader.Priority = ieee8021q->PriorityCodePoint;
+        }
+
+        if (ieee8021q->TxTagging & NetPacketTxIeee8021qActionFlagVlanRequired) {
+            UINT16 vlan = ieee8021q->VlanIdentifier;
+            tag8021q.TagHeader.VLanID2 = vlan & 0xff;
+            tag8021q.TagHeader.VLanID1 = (vlan >> 8) & 0xf;
+        }
+
+        opts2 |= (tag8021q.Value & RL_TDESC_VLANCTL_DATA);
+    }
+
     if (checksumEnabled) {
         NET_PACKET_CHECKSUM* checksumInfo =
             NetExtensionGetPacketChecksum(&tx->ChecksumExtension, packetIndex);

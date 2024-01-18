@@ -164,6 +164,7 @@ RtInitializeHardware(
             CSUM_UDP_IPV6);
         sc->if_capenable &= ~(IFCAP_TSO6 | IFCAP_HWCSUM_IPV6);
     }
+    sc->if_capenable |= IFCAP_VLAN_MTU | IFCAP_VLAN_HWTAGGING;
 
     adapter->bsdData.re_rx_cstag = 1;
     adapter->bsdData.re_tx_cstag = 1;

@@ -18,6 +18,7 @@ typedef struct _RT_RXQUEUE {
 	NET_EXTENSION VirtualAddressExtension;
 	NET_EXTENSION LogicalAddressExtension;
 	NET_EXTENSION HashValueExtension;
+	NET_EXTENSION Ieee8021qExtension;
 
 	ULONG QueueId;
 } RT_RXQUEUE, * PRT_RXQUEUE;
