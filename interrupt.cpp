@@ -81,7 +81,7 @@ EvtInterruptIsr(
 	}
 
 	/* Rx interrupt */
-	if (status & (RE_ISR_RX_OK | RE_ISR_FIFO_OFLOW)) {
+	if (status & (RE_ISR_RX_OK | RE_ISR_FIFO_OFLOW | RE_ISR_RX_ERR)) {
 		if (!InterlockedExchange8(&interrupt->rxInterrupt, TRUE))
 			queueDPC = TRUE;
 	}

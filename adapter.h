@@ -68,6 +68,10 @@ typedef struct _RT_ADAPTER
     BOOLEAN TxTcpHwChkSum;
     BOOLEAN TxUdpHwChkSum;
 
+    BOOLEAN RxIpHwChkSum;
+    BOOLEAN RxTcpHwChkSum;
+    BOOLEAN RxUdpHwChkSum;
+
     struct re_softc bsdData;
 } RT_ADAPTER, * PRT_ADAPTER;
 

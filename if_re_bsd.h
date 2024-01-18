@@ -663,6 +663,7 @@ union TxDesc {
 #define RL_FLAG_PCIE            0x40000000
 #define RL_FLAG_MAGIC_PACKET_V3 0x80000000
 
+#define RL_CRC          (1 << 19)
 #define RL_PID0 		(1<<17)
 #define RL_PID1 		(1<<18)
 #define RL_ProtoUDP  	(RL_PID1)

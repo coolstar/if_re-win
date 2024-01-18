@@ -83,6 +83,102 @@ Exit:
     return status;
 }
 
+static
+void
+RtFillRxChecksumInfo(
+    _In_    RT_RXQUEUE const* rx,
+    _In_    RxDesc const* rxd,
+    _In_    UINT32 packetIndex,
+    _Inout_ NET_PACKET* packet
+)
+{
+
+    const RT_ADAPTER* adapter = rx->Adapter;
+    const struct re_softc* sc = &adapter->bsdData;
+
+    NET_PACKET_CHECKSUM* checksumInfo =
+        NetExtensionGetPacketChecksum(
+            &rx->ChecksumExtension,
+            packetIndex);
+
+#define opts1 rxd->ul[0]
+#define opts2 rxd->ul[1]
+
+    checksumInfo->Layer2 =
+        (opts1 & RL_CRC)
+        ? NetPacketRxChecksumEvaluationInvalid
+        : NetPacketRxChecksumEvaluationValid;
+
+    if ((sc->re_if_flags & RL_FLAG_DESCV2) == 0) {
+        UINT32 proto = opts1 & RL_ProtoMASK;
+
+        if (proto != 0) {
+            packet->Layout.Layer3Type = NetPacketLayer3TypeIPv4UnspecifiedOptions;
+
+            if (adapter->RxIpHwChkSum) {
+                checksumInfo->Layer3 = (opts1 & RL_IPF) ? NetPacketRxChecksumEvaluationInvalid :
+                    NetPacketRxChecksumEvaluationValid;
+            }
+        }
+        else {
+            return;
+        }
+
+        if (proto == RL_ProtoTCP) {
+            packet->Layout.Layer4Type = NetPacketLayer4TypeTcp;
+
+            if (adapter->TxTcpHwChkSum) {
+                checksumInfo->Layer4 = (opts1 & RL_TCPF) ? NetPacketRxChecksumEvaluationInvalid :
+                    NetPacketRxChecksumEvaluationValid;
+            }
+        }
+        else if (proto == RL_ProtoUDP) {
+            packet->Layout.Layer4Type = NetPacketLayer4TypeUdp;
+
+            if (adapter->RxUdpHwChkSum) {
+                checksumInfo->Layer4 = (opts1 & RL_UDPF) ? NetPacketRxChecksumEvaluationInvalid :
+                    NetPacketRxChecksumEvaluationValid;
+            }
+        }
+    }
+    else {
+        /*
+        * RTL8168C/RTL816CP/RTL8111C/RTL8111CP
+        */
+        if (opts2 & RL_V4F) {
+            packet->Layout.Layer3Type = NetPacketLayer3TypeIPv4UnspecifiedOptions;
+
+            if (adapter->RxIpHwChkSum) {
+                checksumInfo->Layer3 = (opts1 & RL_IPF) ? NetPacketRxChecksumEvaluationInvalid :
+                    NetPacketRxChecksumEvaluationValid;
+            }
+        }
+        else if (opts2 & RL_V6F) {
+            packet->Layout.Layer3Type = NetPacketLayer3TypeIPv6UnspecifiedExtensions;
+        }
+        else {
+            return;
+        }
+
+        if (opts1 & RL_TCPT) {
+            packet->Layout.Layer4Type = NetPacketLayer4TypeTcp;
+
+            if (adapter->TxTcpHwChkSum) {
+                checksumInfo->Layer4 = (opts1 & RL_TCPF) ? NetPacketRxChecksumEvaluationInvalid :
+                    NetPacketRxChecksumEvaluationValid;
+            }
+        }
+        else if (opts1 & RL_UDPT) {
+            packet->Layout.Layer4Type = NetPacketLayer4TypeUdp;
+
+            if (adapter->RxUdpHwChkSum) {
+                checksumInfo->Layer4 = (opts1 & RL_UDPF) ? NetPacketRxChecksumEvaluationInvalid :
+                    NetPacketRxChecksumEvaluationValid;
+            }
+        }
+    }
+}
+
 static UINT32 GetRxIndexFromFragment(
     _In_ RT_RXQUEUE* rx,
     _In_ UINT32 fragmentIdx
@@ -126,14 +222,14 @@ RxIndicateReceives(
         packet->FragmentIndex = fragmentIndex;
         packet->FragmentCount = 1;
 
-        //TODO
-        /*if (rx->ChecksumExtension.Enabled)
+        
+        if (rx->ChecksumExtension.Enabled)
         {
-            // fill packetTcpChecksum
             RtFillRxChecksumInfo(rx, rxd, packetIndex, packet);
         }
 
-        if (rx->HashValueExtension.Enabled && rx->Adapter->RssEnabled)
+        //TODO
+        /*if (rx->HashValueExtension.Enabled && rx->Adapter->RssEnabled)
         {
             // fill packet hash value
             RtFillReceiveScalingInfo(rx, rxd, packetIndex);

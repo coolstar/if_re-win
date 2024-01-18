@@ -183,6 +183,20 @@ EvtAdapterOffloadSetTxChecksum(
 
 static
 void
+EvtAdapterOffloadSetRxChecksum(
+    _In_ NETADAPTER netAdapter,
+    _In_ NETOFFLOAD offload
+)
+{
+    RT_ADAPTER* adapter = RtGetAdapterContext(netAdapter);
+
+    adapter->RxIpHwChkSum = NetOffloadIsRxChecksumIPv4Enabled(offload);
+    adapter->RxTcpHwChkSum = NetOffloadIsRxChecksumTcpEnabled(offload);
+    adapter->RxUdpHwChkSum = NetOffloadIsRxChecksumUdpEnabled(offload);
+}
+
+static
+void
 RtAdapterSetOffloadCapabilities(
     _In_ RT_ADAPTER const* adapter
 )
@@ -191,29 +205,38 @@ RtAdapterSetOffloadCapabilities(
 
     const struct re_softc* sc = &adapter->bsdData;
 
-    BOOLEAN checksumSupported = (sc->if_hwassist & RE_CSUM_FEATURES) != 0;
-    if (!checksumSupported) {
-        return;
+    BOOLEAN txSupported = (sc->if_capenable & IFCAP_TXCSUM) != 0;
+    /*if (txSupported) {
+        auto const layer3Flags = NetAdapterOffloadLayer3FlagIPv4NoOptions |
+            NetAdapterOffloadLayer3FlagIPv4WithOptions |
+            NetAdapterOffloadLayer3FlagIPv6NoExtensions |
+            NetAdapterOffloadLayer3FlagIPv6WithExtensions;
+
+        auto const layer4Flags = NetAdapterOffloadLayer4FlagTcpNoOptions |
+            NetAdapterOffloadLayer4FlagTcpWithOptions |
+            NetAdapterOffloadLayer4FlagUdp;
+
+        NET_ADAPTER_OFFLOAD_TX_CHECKSUM_CAPABILITIES_INIT(
+            &txChecksumOffloadCapabilities,
+            layer3Flags,
+            EvtAdapterOffloadSetTxChecksum);
+
+        txChecksumOffloadCapabilities.Layer4Flags = layer4Flags;
+        txChecksumOffloadCapabilities.Layer4HeaderOffsetLimit = RT_CHECKSUM_OFFLOAD_LAYER_4_HEADER_OFFSET_LIMIT;
+
+        NetAdapterOffloadSetTxChecksumCapabilities(adapter->NetAdapter, &txChecksumOffloadCapabilities);
+    }*/
+
+    BOOLEAN rxSupported = (sc->if_capenable & IFCAP_RXCSUM) != 0;
+    if (rxSupported) {
+        NET_ADAPTER_OFFLOAD_RX_CHECKSUM_CAPABILITIES rxChecksumOffloadCapabilities;
+
+        NET_ADAPTER_OFFLOAD_RX_CHECKSUM_CAPABILITIES_INIT(
+            &rxChecksumOffloadCapabilities,
+            EvtAdapterOffloadSetRxChecksum);
+
+        NetAdapterOffloadSetRxChecksumCapabilities(adapter->NetAdapter, &rxChecksumOffloadCapabilities);
     }
-
-    auto const layer3Flags = NetAdapterOffloadLayer3FlagIPv4NoOptions |
-        NetAdapterOffloadLayer3FlagIPv4WithOptions |
-        NetAdapterOffloadLayer3FlagIPv6NoExtensions |
-        NetAdapterOffloadLayer3FlagIPv6WithExtensions;
-
-    auto const layer4Flags = NetAdapterOffloadLayer4FlagTcpNoOptions |
-        NetAdapterOffloadLayer4FlagTcpWithOptions |
-        NetAdapterOffloadLayer4FlagUdp;
-
-    NET_ADAPTER_OFFLOAD_TX_CHECKSUM_CAPABILITIES_INIT(
-        &txChecksumOffloadCapabilities,
-        layer3Flags,
-        EvtAdapterOffloadSetTxChecksum);
-
-    txChecksumOffloadCapabilities.Layer4Flags = layer4Flags;
-    txChecksumOffloadCapabilities.Layer4HeaderOffsetLimit = RT_CHECKSUM_OFFLOAD_LAYER_4_HEADER_OFFSET_LIMIT;
-
-    NetAdapterOffloadSetTxChecksumCapabilities(adapter->NetAdapter, &txChecksumOffloadCapabilities);
 }
 
 _Use_decl_annotations_
