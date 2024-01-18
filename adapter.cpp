@@ -206,7 +206,7 @@ RtAdapterSetOffloadCapabilities(
     const struct re_softc* sc = &adapter->bsdData;
 
     BOOLEAN txSupported = (sc->if_capenable & IFCAP_TXCSUM) != 0;
-    /*if (txSupported) {
+    if (txSupported) {
         auto const layer3Flags = NetAdapterOffloadLayer3FlagIPv4NoOptions |
             NetAdapterOffloadLayer3FlagIPv4WithOptions |
             NetAdapterOffloadLayer3FlagIPv6NoExtensions |
@@ -225,7 +225,7 @@ RtAdapterSetOffloadCapabilities(
         txChecksumOffloadCapabilities.Layer4HeaderOffsetLimit = RT_CHECKSUM_OFFLOAD_LAYER_4_HEADER_OFFSET_LIMIT;
 
         NetAdapterOffloadSetTxChecksumCapabilities(adapter->NetAdapter, &txChecksumOffloadCapabilities);
-    }*/
+    }
 
     BOOLEAN rxSupported = (sc->if_capenable & IFCAP_RXCSUM) != 0;
     if (rxSupported) {

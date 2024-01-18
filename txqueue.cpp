@@ -179,7 +179,7 @@ RtProgramOffloadDescriptor(
 #define opts1 txd->ul[0]
 #define opts2 txd->ul[1]
 
-    BOOLEAN checksumEnabled = tx->ChecksumExtension.Enabled &&
+    bool checksumEnabled = tx->ChecksumExtension.Enabled &&
         (adapter->TxTcpHwChkSum || adapter->TxIpHwChkSum || adapter->TxUdpHwChkSum);
 
     if (checksumEnabled) {
