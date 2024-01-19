@@ -98,7 +98,7 @@ static void re_clrwol			__P((struct re_softc*));
 static void re_set_wol_linkspeed 	__P((struct re_softc*));
 #endif
 
-static void re_set_rx_packet_filter	__P((struct re_softc*));
+void re_set_rx_packet_filter	__P((struct re_softc*));
 
 static void re_eeprom_ShiftOutBits		__P((struct re_softc*, int, int));
 static u_int16_t re_eeprom_ShiftInBits		__P((struct re_softc*));
@@ -5650,20 +5650,55 @@ void re_stop(struct re_softc* sc) {
     re_reset(sc);
 }
 
-static void re_set_rx_packet_filter(struct re_softc* sc) {
+void re_set_rx_packet_filter(struct re_softc* sc) {
     u_int32_t rxfilt;
-
+    
     rxfilt = CSR_READ_4(sc, RE_RXCFG);
 
-    rxfilt |= RE_RXCFG_RX_INDIV;
+    rxfilt &= ~(RE_RXCFG_RX_ALLPHYS | RE_RXCFG_RX_INDIV |
+        RE_RXCFG_RX_MULTI | RE_RXCFG_RX_BROAD |
+        RE_RXCFG_RX_RUNT | RE_RXCFG_RX_ERRPKT);
 
-    rxfilt |= (RE_RXCFG_RX_ALLPHYS | RE_RXCFG_RX_MULTI);
-    rxfilt |= RE_RXCFG_RX_BROAD;
+    NET_PACKET_FILTER_FLAGS flags = sc->dev->PacketFilterFlags;
+
+    if (flags & NetPacketFilterFlagPromiscuous) {
+        rxfilt |= (
+            RE_RXCFG_RX_ALLPHYS | RE_RXCFG_RX_INDIV |
+            RE_RXCFG_RX_MULTI | RE_RXCFG_RX_BROAD |
+            RE_RXCFG_RX_RUNT | RE_RXCFG_RX_ERRPKT
+            );
+    }
+    else {
+        rxfilt |= ((flags & NetPacketFilterFlagAllMulticast) ? (RE_RXCFG_RX_ALLPHYS | RE_RXCFG_RX_MULTI) : 0);
+        rxfilt |= ((flags & NetPacketFilterFlagMulticast) ? (RE_RXCFG_RX_ALLPHYS | RE_RXCFG_RX_MULTI) : 0);
+        rxfilt |= ((flags & NetPacketFilterFlagBroadcast) ? RE_RXCFG_RX_BROAD : 0);
+        rxfilt |= ((flags & NetPacketFilterFlagDirected) ? RE_RXCFG_RX_INDIV : 0);
+    }
 
     CSR_WRITE_4(sc, RE_RXCFG, rxfilt);
 
-    u_int32_t mask0 = 0xffffffff;
-    u_int32_t mask4 = 0xffffffff;
+    typedef union {
+        struct {
+            uint32_t mask0;
+            uint32_t mask4;
+        };
+        uint8_t bytes[32];
+    } MarRegs;
+
+    MarRegs regs = { 0 };
+
+    if (flags & (NetPacketFilterFlagPromiscuous | NetPacketFilterFlagAllMulticast)) {
+        regs.mask0 = 0xffffffff;
+        regs.mask4 = 0xffffffff;
+    }
+    else {
+        for (UINT i = 0; i < sc->dev->MCAddressCount; i++) {
+            UCHAR byte, bit;
+            NET_ADAPTER_LINK_LAYER_ADDRESS address = sc->dev->MCList[i];
+            GetMulticastBit(&sc->dev->MCList[i], &byte, &bit);
+            regs.bytes[byte] |= bit;
+        }
+    }
 
     u_int8_t  enable_cfg_reg_write = 0;
 
@@ -5672,8 +5707,10 @@ static void re_set_rx_packet_filter(struct re_softc* sc) {
 
     if (enable_cfg_reg_write)
         re_enable_cfg9346_write(sc);
-    CSR_WRITE_4(sc, RE_MAR0, mask0);
-    CSR_WRITE_4(sc, RE_MAR4, mask4);
+
+    CSR_WRITE_4(sc, RE_MAR0, regs.mask0);
+    CSR_WRITE_4(sc, RE_MAR4, regs.mask4);
+
     if (enable_cfg_reg_write)
         re_disable_cfg9346_write(sc);
 }

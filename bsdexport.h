@@ -25,3 +25,4 @@ int re_ifmedia_upd(struct re_softc* sc);
 int re_ifmedia_upd_8125(struct re_softc* sc);
 
 void re_rar_set(struct re_softc* sc, u_int8_t* eaddr);
+void re_set_rx_packet_filter(struct re_softc* sc);

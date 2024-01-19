@@ -223,6 +223,7 @@
     <ClCompile Include="driver.cpp" />
     <ClCompile Include="interrupt.cpp" />
     <ClCompile Include="link.cpp" />
+    <ClCompile Include="mcast.cpp" />
     <ClCompile Include="pciconfig.cpp" />
     <ClCompile Include="power.cpp" />
     <ClCompile Include="rtlhw.cpp" />

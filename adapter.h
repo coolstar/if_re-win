@@ -3,6 +3,17 @@
 #include "if_re_bsd.h"
 #include "bsdexport.h"
 
+// multicast list size
+#define RT_MAX_MCAST_LIST 32
+
+// supported filters
+#define RT_SUPPORTED_FILTERS (          \
+    NetPacketFilterFlagDirected    | \
+    NetPacketFilterFlagMulticast   | \
+    NetPacketFilterFlagBroadcast   | \
+    NetPacketFilterFlagPromiscuous | \
+    NetPacketFilterFlagAllMulticast)
+
 #define RT_MAX_TX_QUEUES (2)
 #define RT_MAX_RX_QUEUES (4)
 #define RT_MAX_QUEUES RT_MAX_RX_QUEUES
@@ -70,6 +81,11 @@ typedef struct _RT_ADAPTER
     // Pointer to interrupt object
     RT_INTERRUPT* Interrupt;
 
+    // Multicast list
+    NET_PACKET_FILTER_FLAGS PacketFilterFlags;
+    UINT MCAddressCount;
+    NET_ADAPTER_LINK_LAYER_ADDRESS MCList[RT_MAX_MCAST_LIST];
+
     // Configuration
     REG_SPEED_SETTING SpeedDuplex;
     NET_ADAPTER_LINK_LAYER_ADDRESS PermanentAddress;
@@ -115,3 +131,10 @@ void ConfigWrite8(_In_ RT_ADAPTER* adapter, UINT32 reg, UINT8 val);
 void ConfigWrite16(_In_ RT_ADAPTER* adapter, UINT32 reg, UINT16 val);
 
 void RtResetQueues(_In_ RT_ADAPTER* adapter);
+
+void
+GetMulticastBit(
+    _In_ NET_ADAPTER_LINK_LAYER_ADDRESS const* address,
+    _Out_ _Post_satisfies_(*byte < MAX_NIC_MULTICAST_REG) UCHAR* byte,
+    _Out_ UCHAR* value
+);
