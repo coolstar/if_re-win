@@ -96,7 +96,7 @@
 #include "if.h"
 #include "mbuf.h"
 
-NTSYSAPI extern "C" ULONG RtlRandomEx(
+extern "C" NTSYSAPI ULONG RtlRandomEx(
     _Inout_ PULONG Seed
 );
 

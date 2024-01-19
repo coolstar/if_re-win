@@ -628,7 +628,6 @@ EvtTxQueueCancel(
     TraceEntry(TraceLoggingPointer(txQueue, "TxQueue"));
 
     RT_TXQUEUE* tx = RtGetTxQueueContext(txQueue);
-    RT_ADAPTER* adapter = tx->Adapter;
 
     //
     // If the chipset is able to cancel outstanding IOs, then it should do so

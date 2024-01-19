@@ -503,7 +503,6 @@ EvtRxQueueCancel(
     TraceEntry(TraceLoggingPointer(rxQueue, "RxQueue"));
 
     RT_RXQUEUE* rx = RtGetRxQueueContext(rxQueue);
-    RT_ADAPTER* adapter = rx->Adapter;
 
     // try (but not very hard) to grab anything that may have been
     // indicated during rx disable. advance will continue to be called

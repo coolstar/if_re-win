@@ -35,12 +35,12 @@ typedef enum REG_SPEED_SETTING {
     RtSpeedDuplexMode5GFullDuplex = 8
 } REG_SPEED_SETTING;
 
-typedef enum FLOW_CTRL {
+typedef enum _FLOW_CTRL {
     NoFlowControl = 0,
     FlowControlTxOnly = 1,
     FlowControlRxOnly = 2,
     FlowControlTxRx = 3
-};
+} FLOW_CTRL;
 
 typedef struct _RT_TAG_802_1Q
 {
