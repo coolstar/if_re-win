@@ -92,6 +92,7 @@ typedef struct _RT_ADAPTER
     NET_ADAPTER_LINK_LAYER_ADDRESS CurrentAddress;
     BOOLEAN OverrideAddress;
     FLOW_CTRL FlowControl;
+    UINT16 VlanID;
 
     BOOLEAN isRTL8125;
     ULONG64 MaxSpeed;

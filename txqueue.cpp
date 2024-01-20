@@ -197,11 +197,15 @@ RtProgramOffloadDescriptor(
             tag8021q.TagHeader.Priority = ieee8021q->PriorityCodePoint;
         }
 
+        UINT16 vlan = 0;
         if (ieee8021q->TxTagging & NetPacketTxIeee8021qActionFlagVlanRequired) {
-            UINT16 vlan = ieee8021q->VlanIdentifier;
-            tag8021q.TagHeader.VLanID2 = vlan & 0xff;
-            tag8021q.TagHeader.VLanID1 = (vlan >> 8) & 0xf;
+            vlan = ieee8021q->VlanIdentifier;
         }
+        else {
+            vlan = adapter->VlanID;
+        }
+        tag8021q.TagHeader.VLanID2 = vlan & 0xff;
+        tag8021q.TagHeader.VLanID1 = (vlan >> 8) & 0xf;
 
         opts2 |= (tag8021q.Value & RL_TDESC_VLANCTL_DATA);
     }

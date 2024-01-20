@@ -74,6 +74,7 @@ AddReg                  = ndi.reg
 ; TODO: Add or remove keywords depending on the features your NIC supports.
 AddReg                  = Speed.kw
 AddReg                  = NetworkAddress.kw
+AddReg                  = VlanID.kw
 AddReg                  = FlowControl.kw
 AddReg                  = OffloadChecksum.kw
 AddReg                  = PriorityVlanTag.kw
@@ -143,6 +144,13 @@ HKR,Ndi\params\NetworkAddress,                  default,        0,  ""
 HKR,Ndi\params\NetworkAddress,                  LimitText,      0,  "12"
 HKR,Ndi\params\NetworkAddress,                  UpperCase,      0,  "1"
 HKR,Ndi\params\NetworkAddress,                  Optional,       0,  "1"
+
+[VlanID.kw]
+HKR, Ndi\params\VlanID,                          ParamDesc,      0, %VlanID%
+HKR, Ndi\params\VlanID,                          type,           0, "int"
+HKR, Ndi\params\VlanID,                          default,        0, "0"
+HKR, Ndi\params\VlanID,                          min,            0, "0"
+HKR, Ndi\params\VlanID,                          max,            0, "4094"
 
 [FlowControl.kw]
 HKR,Ndi\params\*FlowControl,                    ParamDesc,      0,  %FlowControl%
@@ -226,6 +234,7 @@ SpeedDuplex              = "Speed & Duplex"
 1000Mb-Half-Duplex       = "1.0 Gbps Half Duplex"
 1000Mb-Full-Duplex       = "1.0 Gbps Full Duplex"
 NetworkAddress           = "Network Address"
+VlanID                   = "VLAN ID"
 IPChksumOffv4            = "IPv4 Checksum Offload"
 TCPChksumOffv4           = "TCP Checksum Offload (IPv4)"
 UDPChksumOffv4           = "UDP Checksum Offload (IPv4)"
