@@ -1,6 +1,10 @@
 #pragma once
 
+#pragma warning (disable: 4005)
+#pragma warning (disable: 4083)
 #include <stdint.h>
+#pragma warning(default: 4005)
+#pragma warning(default: 4083)
 #include <intrin.h>
 
 // Driver Options
