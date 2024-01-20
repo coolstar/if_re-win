@@ -370,7 +370,6 @@ RtPostTxDescriptor(
     //Make sure opts2 is set first
     MemoryBarrier();
     txd->ul[0] = desc.ul[0];
-    MemoryBarrier();
 
     tx->TxDescIndex = (tx->TxDescIndex + 1) % tx->NumTxDesc;
 }
