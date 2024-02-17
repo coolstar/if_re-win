@@ -6,6 +6,7 @@
 #include "txqueue.h"
 #include "interrupt.h"
 #include "netringiterator.h"
+#include "link.h"
 
 _Use_decl_annotations_
 NTSTATUS
@@ -561,6 +562,8 @@ EvtTxQueueStart(
     adapter->TxQueues[tx->QueueId] = txQueue;
 
     WdfSpinLockRelease(adapter->Lock);
+
+    RtlFirstStart(adapter);
 }
 
 _Use_decl_annotations_

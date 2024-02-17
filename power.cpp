@@ -4,6 +4,7 @@
 #include "power.h"
 #include "device.h"
 #include "adapter.h"
+#include "link.h"
 
 _Use_decl_annotations_
 NTSTATUS
@@ -31,17 +32,7 @@ EvtDeviceD0Entry(
         re_phy_power_up(sc);
         re_hw_phy_config(sc);
 
-        // Init our MAC address
-        re_rar_set(sc, adapter->CurrentAddress.Address);
-
-        if (adapter->isRTL8125) {
-            re_hw_start_unlock_8125(sc);
-            re_ifmedia_upd_8125(sc);
-        }
-        else {
-            re_hw_start_unlock(sc);
-            re_ifmedia_upd(sc);
-        }
+        RtlFirstStart(adapter);
     }
 
     TraceExitResult(STATUS_SUCCESS);

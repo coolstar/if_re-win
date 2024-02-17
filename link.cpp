@@ -24,6 +24,14 @@ static void RtlResetLink(_In_ RT_ADAPTER* adapter) {
     WdfInterruptReleaseLock(adapter->Interrupt->Handle);
 }
 
+void RtlFirstStart(_In_ RT_ADAPTER* adapter) {
+    if (adapter->RxQueues[0] == NULL || adapter->TxQueues[0] == NULL) {
+        return;
+    }
+
+    RtlResetLink(adapter);
+}
+
 void RtlLinkUp(_In_ RT_ADAPTER* adapter) {
     TraceEntryNetAdapter(adapter);
 

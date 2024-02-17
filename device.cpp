@@ -6,6 +6,7 @@
 #include "device.h"
 #include "adapter.h"
 #include "configuration.h"
+#include "link.h"
 
 NTSTATUS
 RtGetResources(
@@ -248,17 +249,7 @@ RtInitializeHardware(
     GOTO_IF_NOT_NT_SUCCESS(Exit, status,
         RtAdapterStart(adapter));
 
-    // Init our MAC address
-    re_rar_set(sc, adapter->CurrentAddress.Address);
-
-    if (adapter->isRTL8125) {
-        re_hw_start_unlock_8125(sc);
-        re_ifmedia_upd_8125(sc);
-    }
-    else {
-        re_hw_start_unlock(sc);
-        re_ifmedia_upd(sc);
-    }
+    RtlFirstStart(adapter);
 
 Exit:
     TraceExitResult(status);

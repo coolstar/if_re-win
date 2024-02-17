@@ -5,6 +5,7 @@
 #include "adapter.h"
 #include "rxqueue.h"
 #include "interrupt.h"
+#include "link.h"
 
 _Use_decl_annotations_
 NTSTATUS
@@ -413,6 +414,8 @@ EvtRxQueueStart(
     //RtAdapterUpdateRcr(adapter);
 
     WdfSpinLockRelease(adapter->Lock);
+
+    RtlFirstStart(adapter);
 }
 
 _Use_decl_annotations_
