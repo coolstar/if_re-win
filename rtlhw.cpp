@@ -2283,10 +2283,15 @@ void re_get_hw_mac_address(struct re_softc* sc, u_int8_t* eaddr)
     }
 
     if (!is_valid_ether_addr(eaddr)) {
-        device_printf(dev, "Invalid ether addr: %6D\n", eaddr, ":");
-        random_ether_addr(eaddr);
-        device_printf(dev, "Random ether addr: %6D\n", eaddr, ":");
-        sc->random_mac = 1;
+        for (i = 0; i < ETHER_ADDR_LEN; i++)
+            eaddr[i] = CSR_READ_1(sc, RE_IDR0 + i);
+
+        if (!is_valid_ether_addr(eaddr)) {
+            device_printf(dev, "Invalid ether addr: %6D\n", eaddr, ":");
+            random_ether_addr(eaddr);
+            device_printf(dev, "Random ether addr: %6D\n", eaddr, ":");
+            sc->random_mac = 1;
+        }
     }
 
     re_rar_set(sc, eaddr);
