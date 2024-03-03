@@ -30,6 +30,15 @@ void RtlFirstStart(_In_ RT_ADAPTER* adapter) {
     }
 
     RtlResetLink(adapter);
+
+    re_softc* sc = &adapter->bsdData;
+
+    if (adapter->isRTL8125) {
+        re_ifmedia_upd_8125(sc);
+    }
+    else {
+        re_ifmedia_upd(sc);
+    }
 }
 
 void RtlLinkUp(_In_ RT_ADAPTER* adapter) {
