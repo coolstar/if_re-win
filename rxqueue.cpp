@@ -507,6 +507,12 @@ EvtRxQueueCancel(
 
     RT_RXQUEUE* rx = RtGetRxQueueContext(rxQueue);
 
+    WdfSpinLockAcquire(rx->Adapter->Lock);
+
+    re_stop(&rx->Adapter->bsdData);
+
+    WdfSpinLockRelease(rx->Adapter->Lock);
+
     // try (but not very hard) to grab anything that may have been
     // indicated during rx disable. advance will continue to be called
     // after cancel until all packets are returned to the framework.

@@ -641,18 +641,5 @@ EvtTxQueueCancel(
     // the queue will continue to be drained like normal.
     //
 
-    NET_RING* pr = NetRingCollectionGetPacketRing(tx->Rings);
-
-    while (pr->BeginIndex != pr->EndIndex)
-    {
-        NET_PACKET* packet = NetRingGetPacketAtIndex(pr, pr->BeginIndex);
-        packet->Ignore = 1;
-
-        pr->BeginIndex = NetRingIncrementIndex(pr, pr->BeginIndex);
-    }
-
-    NET_RING* fr = NetRingCollectionGetFragmentRing(tx->Rings);
-    fr->BeginIndex = fr->EndIndex;
-
     TraceExit();
 }
